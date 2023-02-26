@@ -1,4 +1,4 @@
-# Salt Labs Website
+# MAHDTech Website
 
 This repository contains the source files for [MAHDTech](https://mahdtedch.com)
 
