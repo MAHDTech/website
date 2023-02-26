@@ -463,6 +463,9 @@ params:
   # Use custom favicon (default is `themeColor` square)
   favicon: favicon.png
 
+  # If the resource directory includes cover.png, use it as the cover
+  autoCover: true
+
   # Show the date page was last updated
   showLastUpdated: false
 
@@ -474,6 +477,15 @@ params:
 
   # Set all headings to default size
   oneHeadingSize: true
+
+  # Shows estimated reading time when enabled.
+  readingTime: true
+
+  # Whether to enable a ToC
+  Toc: true
+
+  # The title for the ToC
+  TocTitle: "Table of Contents"
 
   # Set Twitter handles for cards
   # Ref: https://developer.twitter.com/en/docs/tweets/optimize-with-cards/guides/getting-started#card-and-content-attribution
@@ -490,7 +502,7 @@ languages:
     subtitle: MAHD about tech
     owner: MAHDTech
     keywords: blog
-    copyright: Copyright MAHDTech
+    copyright: Copyleft MAHDTech
     menuMore: Show more
     readMore: Read more
     readOtherPosts: Read other posts
