@@ -153,3 +153,32 @@ jobs:
           preCommands: |
             npm --prefix workers-site install
           command: publish --env production
+
+  ##################################################
+  # Giphy thumbs up or down
+  ##################################################
+
+  check:
+
+    name: PR Status Checks
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+
+    needs: deploy
+
+    steps:
+
+      - name: PR Status Giphy
+        id: pr-status-giphy
+        uses: jzweifel/pr-status-giphy-action@master
+        env:
+          GIPHY_API_KEY: ${{ secrets.GIPHY_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
