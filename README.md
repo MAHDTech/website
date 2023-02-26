@@ -25,3 +25,5 @@ GitHubIssueId = 1
 ```
 
 Any comments to that GitHub issue are then loaded automatically onto the website.
+
+A Discord webhook has been configured to post comments in the #CI channel.
