@@ -1,0 +1,9 @@
+
+[submodule "themes/terminal"]
+    path = themes/terminal
+    url = git@github.com:panr/hugo-theme-terminal.git
+    update = checkout
+    branch = master
+    fetchRecurseSubmodules = true
+    ignore = none
+    shallow = false
