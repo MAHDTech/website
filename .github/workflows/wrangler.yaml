@@ -39,7 +39,7 @@ on:
 
 permissions:
   contents: read
-  pull-requests: read
+  pull-requests: write
 
 defaults:
 
@@ -153,3 +153,67 @@ jobs:
           preCommands: |
             npm --prefix workers-site install
           command: publish --env production
+
+  ##################################################
+  # Giphy thumbs up or down
+  ##################################################
+
+  check:
+
+    name: PR Status Checks
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+
+    needs: deploy
+
+    steps:
+
+      - name: PR Status Giphy
+        id: pr-status-giphy
+        uses: dgteixeira/pr-status-giphy-action@v2
+        env:
+          GIPHY_API_KEY: ${{ secrets.GIPHY_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  ##################################################
+  # Send a notification to Discord
+  ##################################################
+
+  discord:
+
+    name: Discord
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 5
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+    steps:
+
+      - name: Post message to Discord
+        id: discord_message
+        env:
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_DISCORD }}
+          MESSAGE: >
+            "
+            A ${{ github.event_name }} event was triggered in ${{ github.repository }} repository.
+            The comment is available to view [here](${{ github.event.comment.html_url }})
+            "
+        run: >
+          curl
+          --request POST
+          --header "Content-Type: application/json"
+          --data "{\"content\": \"${MESSAGE}\"}"
+          $WEBHOOK_URL
