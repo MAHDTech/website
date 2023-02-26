@@ -178,7 +178,7 @@ jobs:
 
       - name: PR Status Giphy
         id: pr-status-giphy
-        uses: jzweifel/pr-status-giphy-action@master
+        uses: dgteixeira/pr-status-giphy-action@v2
         env:
           GIPHY_API_KEY: ${{ secrets.GIPHY_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -208,12 +208,12 @@ jobs:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_DISCORD }}
           MESSAGE: >
             "
-            The ${{ github.event_name }} was triggered in ${{ github.repository }} repository.
+            A ${{ github.event_name }} event was triggered in ${{ github.repository }} repository.
             The comment is available to view [here](${{ github.event.comment.html_url }})
             "
         run: >
           curl
           --request POST
-          --header 'Content-Type: application/json'
-          --data '{\"content\": \"${MESSAGE}\"}'
+          --header "Content-Type: application/json"
+          --data "{\"content\": \"${MESSAGE}\"}"
           $WEBHOOK_URL
