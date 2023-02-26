@@ -19,32 +19,11 @@ defaults:
   run:
     shell: bash
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
-
-  ##################################################
-  # Posts octocat images if a comment '/octocat'
-  ##################################################
-
-  octocat:
-
-    name: Octocat
-
-    runs-on: ${{ matrix.os }}
-
-    timeout-minutes: 5
-
-    strategy:
-      fail-fast: true
-      matrix:
-        os:
-          - ubuntu-latest
-    steps:
-
-      - id: octocat
-        name: Post image from Octodex
-        uses: ethomson/mona-action@master
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
   ##################################################
   # Posts Giphy comments on '/giphy search_term'
@@ -63,16 +42,17 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
+
     steps:
 
       - id: giphy
         name: Giphy image search
-        uses: iamhughes/giphy-generator@v1
+        uses: IAmHughes/giphy-generator@v1.0.0
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
           GIPHY_TOKEN: "${{ secrets.GIPHY_TOKEN }}"
         with:
-          rating: 'PG-13' # G, PG, PG-13, R
+          rating: 'PG-13'          # G, PG, PG-13, R
           lang: 'en'
 
   ##################################################
@@ -98,13 +78,16 @@ jobs:
         id: discord_message
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_DISCORD }}
-          MESSAGE: |
-            "The ${{ github.event_name }} was triggered in ${{ github.repository }} repository.
-
-            The comment is available to view [here](${{ github.event.comment.html_url }})"
-        run: >
-          curl
-          --request POST
-          --header 'Content-Type: application/json'
-          --data '{\"content\": \"${MESSAGE}\"}'
+          PING: "@MAHDTech"
+          MESSAGE: >
+            The ${{ github.event_name }} event was triggered in the ${{ github.repository }} repository.
+            The comment is available to view [here](${{ github.event.comment.html_url }})
+        run: |
+          sudo apt install jq --yes
+          JSON_CONTENT=$(jq -n --arg 'content' "${PING} ${MESSAGE}" '$ARGS.named')
+          curl \
+          --verbose \
+          --request POST \
+          --header "Content-Type: application/json" \
+          --data "${JSON_CONTENT}" \
           $WEBHOOK_URL
