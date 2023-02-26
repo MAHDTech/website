@@ -443,7 +443,7 @@ params:
   GitHubRepo: "website"
 
   # Dir name where posts are (content/post)
-  contentTypeName: post
+  contentTypeName: posts
 
   # Theme color from; orange, blue, red, green, pink
   themeColor: green
