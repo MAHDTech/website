@@ -78,14 +78,17 @@ jobs:
         id: discord_message
         env:
           WEBHOOK_URL: ${{ secrets.WEBHOOK_DISCORD }}
+          PING: "@MAHDTech"
           MESSAGE: >
             "
-            The ${{ github.event_name }} was triggered in ${{ github.repository }} repository.
+            ${PING}!
+            The ${{ github.event_name }} event was triggered in ${{ github.repository }} repository.
             The comment is available to view [here](${{ github.event.comment.html_url }})
             "
+          JSON_CONTENT: "{\"content\": \"${MESSAGE}\"}"
         run: >
           curl
           --request POST
           --header "Content-Type: application/json"
-          --data "{\"content\": \"${MESSAGE}\"}"
+          --data "${JSON_CONTENT}"
           $WEBHOOK_URL

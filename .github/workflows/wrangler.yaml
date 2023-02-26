@@ -179,6 +179,7 @@ jobs:
       - name: PR Status Giphy
         id: pr-status-giphy
         uses: dgteixeira/pr-status-giphy-action@v2
+        if: github.event_name == 'pull_request'
         env:
           GIPHY_API_KEY: ${{ secrets.GIPHY_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
