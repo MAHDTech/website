@@ -409,7 +409,7 @@ themesDir: themes
 timeout: 10000
 
 # Website title
-Title: MAHDTech
+title: MAHDTech
 
 # Title case style
 # Ref: https://gohugo.io/getting-started/configuration/#configure-title-case
