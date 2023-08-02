@@ -1,6 +1,6 @@
 # MAHDTech Website
 
-This repository contains the source files for [MAHDTech](https://mahdtedch.com)
+This repository contains the source files for [MAHDTech](https://mahdtech.com)
 
 ## How to generate new website content
 
