@@ -263,7 +263,7 @@ markup:
     lineNoStart: 1
     lineNos: false
     lineNumbersInTable: true
-    noClasses: true
+    noClasses: false # Required for Chroma and custom syntax highlighting
     style: monokai
     tabWidth: 4
 
@@ -441,7 +441,7 @@ params:
   showLanguageSelector: false
 
   # Enable full screen width theme
-  fullWidthTheme: false
+  fullWidthTheme: true
 
   # Center the theme with default width
   centerTheme: true
