@@ -440,10 +440,9 @@ params:
   # Show selector to switch language
   showLanguageSelector: false
 
-  # Enable full screen width theme
-  fullWidthTheme: true
-
-  # Center the theme with default width
+  # Either enable the theme full screen width
+  fullWidthTheme: false
+  # Or, center the theme within the default width
   centerTheme: true
 
   # Use custom favicon (default is `themeColor` square)
