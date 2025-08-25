@@ -3,7 +3,7 @@
     path = themes/terminal
     url = git@github.com:panr/hugo-theme-terminal.git
     update = checkout
-    branch = master
+    rev = v4.2.3
     fetchRecurseSubmodules = true
     ignore = none
     shallow = false

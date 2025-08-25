@@ -23,8 +23,6 @@ updates:
       timezone: "Australia/Sydney"
     assignees:
       - "MAHDTech"
-    reviewers:
-      - "MAHDTech"
     labels:
       - "dependencies"
       - "dependabot"
@@ -47,8 +45,6 @@ updates:
       time: "00:00"
       timezone: "Australia/Sydney"
     assignees:
-      - "MAHDTech"
-    reviewers:
       - "MAHDTech"
     labels:
       - "dependencies"
@@ -73,8 +69,6 @@ updates:
       timezone: "Australia/Sydney"
     assignees:
       - "MAHDTech"
-    reviewers:
-      - "MAHDTech"
     labels:
       - "dependencies"
       - "dependabot"
@@ -98,8 +92,6 @@ updates:
       timezone: "Australia/Sydney"
     assignees:
       - "MAHDTech"
-    reviewers:
-      - "MAHDTech"
     labels:
       - "dependencies"
       - "dependabot"
@@ -122,8 +114,6 @@ updates:
       time: "00:00"
       timezone: "Australia/Sydney"
     assignees:
-      - "MAHDTech"
-    reviewers:
       - "MAHDTech"
     labels:
       - "dependencies"

@@ -1,5 +1,4 @@
 ---
-
 ##################################################
 # Hugo
 ##################################################
@@ -126,7 +125,6 @@ enableRobotsTXT: true
 
 # Front Matter configuration
 frontmatter:
-
   date:
     - date
     - publishDate
@@ -162,7 +160,6 @@ hasCJKLanguage: false
 
 # Image processing configuration
 imaging:
-
   # Resample filter
   # Ref: https://github.com/disintegration/imaging
   resampleFilter: box
@@ -178,7 +175,6 @@ imaging:
 
   # EXIF config
   exif:
-
     includeFields: ""
 
     excludeFields: ""
@@ -209,7 +205,6 @@ logFile: "hugo.log"
 
 # Markup configuration
 markup:
-
   asciidocExt:
     attributes: {}
     backend: html5
@@ -268,7 +263,7 @@ markup:
     lineNoStart: 1
     lineNos: false
     lineNumbersInTable: true
-    noClasses: true
+    noClasses: false # Required for Chroma and custom syntax highlighting
     style: monokai
     tabWidth: 4
 
@@ -297,7 +292,6 @@ markup:
 
 # Minify configuration
 minify:
-
   disableCSS: false
   disableHTML: false
   disableJS: false
@@ -332,12 +326,9 @@ noChmod: false
 # Don't sync modification times of files
 noTimes: true
 
-# Default number of elements per page
-paginate: 5
-
-# The path element used during pagination
-# Example: https://website.com/page/2
-paginatePath: page
+pagination:
+  path: page
+  pagerSize: 10
 
 # Permalink configuration
 permalinks:
@@ -351,11 +342,9 @@ publishDir: public
 
 # Related configuration
 related:
-
   includeNewer: false
 
   indices:
-
     - name: keywords
       weight: 100
 
@@ -384,7 +373,6 @@ sectionPagesMenu: main
 
 # Sitemap configuration
 sitemap:
-
   changefreq: monthly
   filename: sitemap.xml
   priority: 0.5
@@ -397,7 +385,6 @@ summaryLength: 70
 
 # Taxonomies configuration
 taxonomies:
-
   category: categories
   tag: tags
 
@@ -417,7 +404,7 @@ title: MAHDTech
 titleCaseStyle: AP
 
 # if true, use /filename.html instead of /filename/
-uglyURLs:  false
+uglyURLs: false
 
 # verbose output
 verbose: true
@@ -433,7 +420,6 @@ watch: true
 ##################################################
 
 params:
-
   # Enable debug for console logging
   debug: false
 
@@ -454,10 +440,9 @@ params:
   # Show selector to switch language
   showLanguageSelector: false
 
-  # Enable full screen width theme
+  # Either enable the theme full screen width
   fullWidthTheme: false
-
-  # Center the theme with default width
+  # Or, center the theme within the default width
   centerTheme: true
 
   # Use custom favicon (default is `themeColor` square)
@@ -495,7 +480,6 @@ params:
 
 # Language configuration
 languages:
-
   en:
     languageName: English
     title: MAHDTech
@@ -513,9 +497,7 @@ languages:
         logoText: MAHDTech
         logoHomeLink: /
     menu:
-
       main:
-
         #- identifier: about
         #  name: About
         #  url: /about
