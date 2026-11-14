@@ -1,0 +1,12 @@
+// Prettier's HTML parser does not understand Tera and rewrites component
+// calls such as `{{ <ui.chip label={x} /> }}` into invalid templates.
+{
+    "languages": {
+        "HTML": {
+            "format_on_save": "off",
+            "prettier": {
+                "allowed": false
+            }
+        }
+    }
+}
