@@ -4,22 +4,22 @@ date: 2026-05-01
 draft: false
 description: "Why unconstrained chat loops fail at repository scale, and how phase-gated contracts, isolated worktrees, and independent verification turn AI agents into reliable engineering spokes."
 taxonomies:
-    tags:
-        - "ai-agents"
-        - "rust"
-        - "architecture"
-        - "devops"
-    categories:
-        - "AI Engineering"
+  tags:
+    - "ai-agents"
+    - "rust"
+    - "architecture"
+    - "devops"
+  categories:
+    - "AI Engineering"
 extra:
-    category: "AI Harness Engineering"
-    image: "/images/posts/ai-harness-guards.svg"
-    image_alt: "Phase-gated orchestration schematic showing hub-and-spoke verification gates"
-    digest: "Unbounded agent loops drift on scope and grade their own homework. Separating specification, implementation, and verification across isolated spokes with machine-checked contracts makes autonomous delivery auditable."
-    key_points:
-        - "Never allow the implementation agent to verify its own diff or mutate scope."
-        - "Bind each execution spoke to an isolated Git worktree and explicit file manifest."
-        - "Enforce deterministic gates (linters, typechecks, reproducible Nix builds) between phases."
+  category: "AI Harness Engineering"
+  image: "/images/posts/ai-harness-guards.svg"
+  image_alt: "Phase-gated orchestration schematic showing hub-and-spoke verification gates"
+  digest: "Unbounded agent loops drift on scope and grade their own homework. Separating specification, implementation, and verification across isolated spokes with machine-checked contracts makes autonomous delivery auditable."
+  key_points:
+    - "Never allow the implementation agent to verify its own diff or mutate scope."
+    - "Bind each execution spoke to an isolated Git worktree and explicit file manifest."
+    - "Enforce deterministic gates (linters, typechecks, reproducible Nix builds) between phases."
 ---
 
 ## Why Unconstrained Agent Loops Drift
@@ -98,9 +98,9 @@ Pinning every compiler, linter, and formatter inside `devenv.nix` and enforcing 
 phase: "R.2_VERIFY"
 status: "PASS"
 checks:
-    nix_devenv_test: "pass"
-    prek_hooks: "pass"
-    scope_manifest_clean: true
+  nix_devenv_test: "pass"
+  prek_hooks: "pass"
+  scope_manifest_clean: true
 ```
 
 ## Takeaways for Platform Teams

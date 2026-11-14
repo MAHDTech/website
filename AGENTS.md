@@ -18,11 +18,11 @@ See the [README.md](./README.md) for how content is edited and what each generat
 
 Everything runs inside the `devenv` environment defined in `devenv.nix`.
 
-| Command                              | Use it to                                                                          |
-| ------------------------------------ | ---------------------------------------------------------------------------------- |
-| `devenv --no-tui shell -- <command>` | Run one command inside the environment.                                            |
-| `devenv --no-tui test`               | Build the site, verify the output, and run every hook. This is what CI runs.       |
-| `devenv up`                          | Start `zola serve` plus the CSS and generated-file watchers. Stop it when done.    |
+| Command                              | Use it to                                                                       |
+| ------------------------------------ | ------------------------------------------------------------------------------- |
+| `devenv --no-tui shell -- <command>` | Run one command inside the environment.                                         |
+| `devenv --no-tui test`               | Build the site, verify the output, and run every hook. This is what CI runs.    |
+| `devenv up`                          | Start `zola serve` plus the CSS and generated-file watchers. Stop it when done. |
 
 - Always pass `--no-tui` to `devenv` in automated or agent sessions so the command cannot hang on the interactive interface.
 - Entering the shell runs `fonts`, `css`, and `generate` when their outputs are missing or stale, so the first entry is slow.

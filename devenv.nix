@@ -59,6 +59,7 @@ in
       prettier = {
         enable = true;
         excludes = [
+          "^static/"
           "^templates/"
         ];
       };

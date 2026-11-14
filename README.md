@@ -34,15 +34,15 @@ date: 2026-11-14
 description: "One or two sentences, shown on the blog card and in link previews."
 draft: true # remove to publish
 taxonomies:
-    tags: ["kubernetes", "rust"]
-    categories: ["Platform Engineering"]
+  tags: ["kubernetes", "rust"]
+  categories: ["Platform Engineering"]
 extra:
-    category: "Platform Engineering" # chip on the card and social image
-    image: "/images/posts/my-cover.svg" # card and header image (16:9)
-    image_alt: "What the image shows"
-    digest: "Optional TL;DR shown at the top of the post."
-    key_points: ["Optional takeaway", "Another takeaway"]
-    comments: false # optional: hide comments on this post
+  category: "Platform Engineering" # chip on the card and social image
+  image: "/images/posts/my-cover.svg" # card and header image (16:9)
+  image_alt: "What the image shows"
+  digest: "Optional TL;DR shown at the top of the post."
+  key_points: ["Optional takeaway", "Another takeaway"]
+  comments: false # optional: hide comments on this post
 ---
 ```
 
