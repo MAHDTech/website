@@ -106,141 +106,143 @@ in
     };
   };
 
-  scripts.terra-templates.exec = ''
-    set -euo pipefail
-    targets=("$@")
-    if [ "''${#targets[@]}" -eq 0 ]; then
-      targets=(templates)
-    fi
-    if ${pkgs.gnugrep}/bin/grep -rnE '[a-zA-Z0-9_-]+="[{][^{%#]' "''${targets[@]}"; then
-      echo "error: quoted Tera component expression detected in templates/" >&2
-      exit 1
-    fi
-  '';
+  scripts = {
+    terra-templates.exec = ''
+      set -euo pipefail
+      targets=("$@")
+      if [ "''${#targets[@]}" -eq 0 ]; then
+        targets=(templates)
+      fi
+      if ${pkgs.gnugrep}/bin/grep -rnE '[a-zA-Z0-9_-]+="[{][^{%#]' "''${targets[@]}"; then
+        echo "error: quoted Tera component expression detected in templates/" >&2
+        exit 1
+      fi
+    '';
 
-  scripts.css.exec = ''
-    set -euo pipefail
-    tailwindcss -i styles/input.css -o static/css/custom.css --minify
-  '';
+    css.exec = ''
+      set -euo pipefail
+      tailwindcss -i styles/input.css -o static/css/custom.css --minify
+    '';
 
-  # Rebuild the stylesheet; fail (so the hook asks for a re-stage) if it changed.
-  scripts.css-check.exec = ''
-    set -euo pipefail
-    before="$(sha256sum static/css/custom.css 2>/dev/null || true)"
-    tailwindcss -i styles/input.css -o static/css/custom.css --minify 2>/dev/null
-    if [ "$before" != "$(sha256sum static/css/custom.css)" ]; then
-      echo "static/css/custom.css was out of date and has been rebuilt; stage it and commit again." >&2
-      exit 1
-    fi
-  '';
+    # Rebuild the stylesheet; fail (so the hook asks for a re-stage) if it changed.
+    css-check.exec = ''
+      set -euo pipefail
+      before="$(sha256sum static/css/custom.css 2>/dev/null || true)"
+      tailwindcss -i styles/input.css -o static/css/custom.css --minify 2>/dev/null
+      if [ "$before" != "$(sha256sum static/css/custom.css)" ]; then
+        echo "static/css/custom.css was out of date and has been rebuilt; stage it and commit again." >&2
+        exit 1
+      fi
+    '';
 
-  # Subset to Latin plus the arrows and symbols the site uses (~65% smaller).
-  scripts.fonts.exec = ''
-    set -euo pipefail
-    ranges="U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2190-21FF,U+2212,U+2215,U+2248,U+2318,U+25A0-25FF,U+FEFF,U+FFFD"
-    subset() {
-      ${fontTools}/bin/pyftsubset "$1" --flavor=woff2 --layout-features='*' --unicodes="$ranges" --output-file="$2"
-    }
-    mkdir -p static/fonts
-    subset "${pkgs.inter}/share/fonts/truetype/InterVariable.ttf" static/fonts/Inter-Variable.woff2
-    subset "${pkgs.jetbrains-mono}/share/fonts/truetype/JetBrainsMono[wght].ttf" static/fonts/JetBrainsMono-Variable.woff2
-    ls -l static/fonts
-  '';
+    # Subset to Latin plus the arrows and symbols the site uses (~65% smaller).
+    fonts.exec = ''
+      set -euo pipefail
+      ranges="U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2190-21FF,U+2212,U+2215,U+2248,U+2318,U+25A0-25FF,U+FEFF,U+FFFD"
+      subset() {
+        ${fontTools}/bin/pyftsubset "$1" --flavor=woff2 --layout-features='*' --unicodes="$ranges" --output-file="$2"
+      }
+      mkdir -p static/fonts
+      subset "${pkgs.inter}/share/fonts/truetype/InterVariable.ttf" static/fonts/Inter-Variable.woff2
+      subset "${pkgs.jetbrains-mono}/share/fonts/truetype/JetBrainsMono[wght].ttf" static/fonts/JetBrainsMono-Variable.woff2
+      ls -l static/fonts
+    '';
 
-  # Full and short PDFs, plus their page counts for the download menu.
-  scripts.resumes.exec = ''
-    set -euo pipefail
-    mkdir -p static/resume
-    for variant in full short; do
-      file="$(jaq --from yaml -r ".downloads.$variant.filename" data/resume.yaml)"
-      typst compile --root . ${typstFonts} --input variant="$variant" resume/resume.typ "static/resume/$file"
-      pages="$(pdfinfo "static/resume/$file" | awk '/^Pages:/ {print $2}')"
-      printf '%s\t%s\n' "$variant" "$pages"
-    done | jaq -Rn '[inputs | split("\t") | {key: "\(.[0])_pages", value: (.[1] | tonumber)}] | from_entries' > static/resume/meta.json
-    echo "resumes: $(jaq -c . static/resume/meta.json)"
-  '';
+    # Full and short PDFs, plus their page counts for the download menu.
+    resumes.exec = ''
+      set -euo pipefail
+      mkdir -p static/resume
+      for variant in full short; do
+        file="$(jaq --from yaml -r ".downloads.$variant.filename" data/resume.yaml)"
+        typst compile --root . ${typstFonts} --input variant="$variant" resume/resume.typ "static/resume/$file"
+        pages="$(pdfinfo "static/resume/$file" | awk '/^Pages:/ {print $2}')"
+        printf '%s\t%s\n' "$variant" "$pages"
+      done | jaq -Rn '[inputs | split("\t") | {key: "\(.[0])_pages", value: (.[1] | tonumber)}] | from_entries' > static/resume/meta.json
+      echo "resumes: $(jaq -c . static/resume/meta.json)"
+    '';
 
-  # 1200x630 PNG social cards: one per post, plus the site and resume cards.
-  scripts.og.exec = ''
-    set -euo pipefail
-    card() { typst compile --root . ${typstFonts} --ppi 144 "$@"; }
-    mkdir -p static/og
-    card --input kind=site resume/og.typ static/og/site.png
-    card --input kind=resume resume/og.typ static/og/resume.png
-    find content -name '*.md' ! -name '_index.md' | while read -r post; do
-      out="static/og/''${post#content/}"
-      mkdir -p "$(dirname "$out")"
-      card --input kind=post --input post="/$post" resume/og.typ "''${out%.md}.png"
-    done
-  '';
-
-  # /resume.json (JSON Resume), /resume.md and /llms.txt for AI agents and tools.
-  scripts.exports.exec = ''
-    set -euo pipefail
-    jaq --from yaml -r --arg format json -f resume/export.jq data/resume.yaml > static/resume.json
-    jaq --from yaml -r --arg format markdown -f resume/export.jq data/resume.yaml > static/resume.md
-
-    base_url="$(jaq --from toml -r .base_url config.toml)"
-    {
-      echo "# $(jaq --from toml -r .title config.toml)"
-      echo
-      echo "> $(jaq --from toml -r .description config.toml)"
-      echo
-      echo "## Resume"
-      echo
-      echo "- [Resume (Markdown)]($base_url/resume.md): full resume as Markdown"
-      echo "- [Resume (JSON Resume)]($base_url/resume.json): structured resume using the jsonresume.org schema"
-      echo "- [Resume (web)]($base_url/resume/): interactive resume with PDF downloads"
-      echo
-      echo "## Posts"
-      echo
-      find content/posts -name '*.md' ! -name '_index.md' | sort | while read -r post; do
-        awk '/^---$/ {n++; next} n == 1' "$post" \
-          | jaq --from yaml -r --arg base "$base_url" --arg stem "$(basename "$post" .md)" \
-            'select(.draft != true) | "- [\(.title)](\($base)/posts/\(.slug // $stem)/): \(.description // "")"'
+    # 1200x630 PNG social cards: one per post, plus the site and resume cards.
+    og.exec = ''
+      set -euo pipefail
+      card() { typst compile --root . ${typstFonts} --ppi 144 "$@"; }
+      mkdir -p static/og
+      card --input kind=site resume/og.typ static/og/site.png
+      card --input kind=resume resume/og.typ static/og/resume.png
+      find content -name '*.md' ! -name '_index.md' | while read -r post; do
+        out="static/og/''${post#content/}"
+        mkdir -p "$(dirname "$out")"
+        card --input kind=post --input post="/$post" resume/og.typ "''${out%.md}.png"
       done
-    } > static/llms.txt
-  '';
+    '';
 
-  # Pagefind index for the Ctrl/Cmd+K palette during `zola serve`.
-  # Production builds index public/ directly (see `build`).
-  scripts.search.exec = ''
-    set -euo pipefail
-    tmp="$(mktemp -d)"
-    trap 'rm -rf "$tmp"' EXIT
-    zola build --force --output-dir "$tmp/site" > /dev/null
-    rm -rf static/pagefind
-    pagefind --site "$tmp/site" --output-path static/pagefind --quiet
-  '';
+    # /resume.json (JSON Resume), /resume.md and /llms.txt for AI agents and tools.
+    exports.exec = ''
+      set -euo pipefail
+      jaq --from yaml -r --arg format json -f resume/export.jq data/resume.yaml > static/resume.json
+      jaq --from yaml -r --arg format markdown -f resume/export.jq data/resume.yaml > static/resume.md
 
-  # The stamp is taken before the run starts, so inputs edited mid-run stay newer
-  # than it and the next shell regenerates. A failed run leaves no stamp.
-  scripts.generate.exec = ''
-    set -euo pipefail
-    mkdir -p "$(dirname "${generateStamp}")"
-    touch "${generateStamp}.pending"
-    resumes
-    og
-    exports
-    search
-    mv "${generateStamp}.pending" "${generateStamp}"
-  '';
+      base_url="$(jaq --from toml -r .base_url config.toml)"
+      {
+        echo "# $(jaq --from toml -r .title config.toml)"
+        echo
+        echo "> $(jaq --from toml -r .description config.toml)"
+        echo
+        echo "## Resume"
+        echo
+        echo "- [Resume (Markdown)]($base_url/resume.md): full resume as Markdown"
+        echo "- [Resume (JSON Resume)]($base_url/resume.json): structured resume using the jsonresume.org schema"
+        echo "- [Resume (web)]($base_url/resume/): interactive resume with PDF downloads"
+        echo
+        echo "## Posts"
+        echo
+        find content/posts -name '*.md' ! -name '_index.md' | sort | while read -r post; do
+          awk '/^---$/ {n++; next} n == 1' "$post" \
+            | jaq --from yaml -r --arg base "$base_url" --arg stem "$(basename "$post" .md)" \
+              'select(.draft != true) | "- [\(.title)](\($base)/posts/\(.slug // $stem)/): \(.description // "")"'
+        done
+      } > static/llms.txt
+    '';
 
-  scripts.build.exec = ''
-    set -euo pipefail
-    generate
-    css
-    zola check
-    zola build
-    pagefind --site public
-  '';
+    # Pagefind index for the Ctrl/Cmd+K palette during `zola serve`.
+    # Production builds index public/ directly (see `build`).
+    search.exec = ''
+      set -euo pipefail
+      tmp="$(mktemp -d)"
+      trap 'rm -rf "$tmp"' EXIT
+      zola build --force --output-dir "$tmp/site" > /dev/null
+      rm -rf static/pagefind
+      pagefind --site "$tmp/site" --output-path static/pagefind --quiet
+    '';
 
-  scripts.check.exec = "zola check";
+    # The stamp is taken before the run starts, so inputs edited mid-run stay newer
+    # than it and the next shell regenerates. A failed run leaves no stamp.
+    generate.exec = ''
+      set -euo pipefail
+      mkdir -p "$(dirname "${generateStamp}")"
+      touch "${generateStamp}.pending"
+      resumes
+      og
+      exports
+      search
+      mv "${generateStamp}.pending" "${generateStamp}"
+    '';
+
+    build.exec = ''
+      set -euo pipefail
+      generate
+      css
+      zola check
+      zola build
+      pagefind --site public
+    '';
+
+    check.exec = "zola check";
+  };
 
   # `devenv up`: zola serve plus watchers that rebuild CSS and generated files.
   # Skipped under `devenv test`, which would otherwise start them alongside the build.
   processes = lib.mkIf (!config.devenv.isTesting) {
-    zola.exec = "zola serve";
+    zola.exec = "zola serve --port 3000";
     tailwind.exec = "tailwindcss -i styles/input.css -o static/css/custom.css --minify --watch=always";
     generate.exec = "watchexec --postpone --debounce 1s --watch data --watch resume --watch content --watch config.toml -- generate";
   };
