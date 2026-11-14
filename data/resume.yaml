@@ -13,14 +13,14 @@ basics:
   name: "Matthew Duncan"
   handle: "MAHDTech"
   title: "Platform Engineer"
-  subtitle: "Freelance Platform, SRE & AI Harness Engineer"
+  subtitle: "Platform, SRE & AI Harness Engineer"
   location: "Canberra, Australia (APAC)"
   email: "matthew.duncan@mahdtech.com"
   github: "MAHDTech"
   github_url: "https://github.com/MAHDTech"
   website: "https://mahdtech.com"
   # Optional availability line shown above your name; leave empty to hide.
-  status: "Shipping"
+  status: "Freelance Contractor"
 
 # Qualitative highlights shown next to the computed experience metrics.
 highlights:

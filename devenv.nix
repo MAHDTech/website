@@ -56,7 +56,12 @@ in
   git-hooks = {
     package = pkgs.prek;
     hooks = {
-      prettier.enable = true;
+      prettier = {
+        enable = true;
+        excludes = [
+          "^templates/"
+        ];
+      };
       nixfmt.enable = true;
       convco.enable = true;
       actionlint.enable = true;
@@ -243,7 +248,7 @@ in
   # `devenv up`: zola serve plus watchers that rebuild CSS and generated files.
   # Skipped under `devenv test`, which would otherwise start them alongside the build.
   processes = lib.mkIf (!config.devenv.isTesting) {
-    zola.exec = "zola serve --port 3000";
+    zola.exec = "zola serve --port 3000 --drafts";
     tailwind.exec = "tailwindcss -i styles/input.css -o static/css/custom.css --minify --watch=always";
     generate.exec = "watchexec --postpone --debounce 1s --watch data --watch resume --watch content --watch config.toml -- generate";
   };
@@ -264,7 +269,7 @@ in
     fi
     echo
     echo "MAHDTech website"
-    echo "  zola serve   preview at http://127.0.0.1:1111 (drafts: zola serve --drafts)"
+    echo "  zola serve   preview at http://127.0.0.1:3000 (drafts: zola serve --drafts)"
     echo "  devenv up    zola serve + live CSS and PDF/card/export rebuilds"
     echo "  generate     rebuild PDFs, social cards, exports and search index"
     echo "  build        full production build into public/"
