@@ -1,9 +1,9 @@
-# Authoritative Zola configuration for MAHDTech (https://mahdtech.com)
+# Site configuration for https://mahdtech.com
+# Personal details (name, email, links) live in data/resume.yaml, not here.
 base_url = "https://mahdtech.com"
 title = "MAHDTech"
-description = "Engineering dispatches and agentic dossier of Matthew Duncan - Senior Platform Engineer specializing in Kubernetes, immutable infrastructure, Rust, NixOS, and AI Harness Engineering."
+description = "Writing and resume of a platform engineer working on Kubernetes, immutable infrastructure, Rust, NixOS and AI harness engineering."
 default_language = "en"
-author = "Matthew Duncan"
 
 compile_sass = false
 build_search_index = false
@@ -28,29 +28,20 @@ theme = "one-dark-pro"
 
 [extra]
 subtitle = "MAHD about tech"
-author_name = "Matthew Duncan"
-author_handle = "MAHDTech"
-author_role = "Senior Platform & AI Harness Engineer"
-location = "Remote (APAC)"
-contact_email = "matthew.duncan@mahdtech.com"
-github_url = "https://github.com/MAHDTech"
 repository_url = "https://github.com/MAHDTech/website"
+# GitHub repository whose issues hold blog post comments (see extra.github_issue_id).
 github_repo = "MAHDTech/website"
 logo_path = "/images/logo.svg"
-og_image = "images/og-banner.svg"
-status_label = "AGENTIC_NODE // ONLINE"
+# Tag and keyword filters appear on the blog index once there are this many posts.
+blog_filter_min_posts = 10
 
+# `also_active` lists extra path prefixes that highlight the item as current.
 [[extra.menu_items]]
-name = "Dispatches"
+name = "Blog"
 url = "/"
-external = false
+also_active = ["/posts/", "/tags/", "/categories/"]
 
 [[extra.menu_items]]
 name = "Resume"
 url = "/resume/"
-external = false
 
-[[extra.menu_items]]
-name = "GitHub"
-url = "https://github.com/MAHDTech"
-external = true

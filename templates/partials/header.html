@@ -1,60 +1,43 @@
+  {% set resume_data = load_data(path="data/resume.yaml") %}{% set person = resume_data.basics %}
   {% set active_path = current_path | default(value="/") %}
+  {% set github_item = {"name": "GitHub", "url": person.github_url, "external": true} %}
   <header class="site-topbar sticky top-0 z-40 monolith-glass">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3 min-w-0">
-        <a href="/" class="group flex items-center gap-3 rounded-[6px]">
-          <img
-            src="{{ config.extra.logo_path | default(value='/images/logo.svg') }}"
-            alt=""
-            aria-hidden="true"
-            width="34"
-            height="34"
-            class="w-8.5 h-8.5 shrink-0 transition-transform duration-200 group-hover:scale-105"
-          >
-          <div class="flex flex-col leading-none">
-            <span class="font-mono font-bold text-base tracking-tight text-text-primary group-hover:text-accent-cyan transition-colors">
-              {{ config.title }}
-            </span>
-            <span class="font-mono text-[10px] uppercase tracking-widest text-text-muted hidden sm:inline mt-0.5">
-              {{ config.extra.author_name | default(value="Matthew Duncan") }}
-            </span>
-          </div>
-        </a>
-      </div>
+      <a href="/" class="group flex items-center gap-3 rounded-[6px] min-w-0">
+        <img src="{{ config.extra.logo_path }}" alt="" width="34" height="34" class="w-8.5 h-8.5 shrink-0 transition-transform duration-200 group-hover:scale-105">
+        <span class="flex flex-col leading-none">
+          <span class="font-mono font-bold text-base tracking-tight text-text-primary group-hover:text-accent-cyan transition-colors">{{ config.title }}</span>
+          <span class="text-[11px] text-text-muted hidden sm:inline mt-1">{{ person.name }}</span>
+        </span>
+      </a>
 
       <nav class="hidden md:flex items-center gap-7" aria-label="Primary">
         {% for item in config.extra.menu_items %}
-          {% set is_current = false %}
-          {% if not item.external %}
-            {% if item.url == "/" and (active_path == "/" or active_path is starting_with(pat="/posts/") or active_path is starting_with(pat="/tags/")) %}
-              {% set is_current = true %}
-            {% elif item.url != "/" and active_path is starting_with(pat=item.url) %}
-              {% set is_current = true %}
-            {% endif %}
-          {% endif %}
-          <a
-            href="{{ item.url | safe }}"
-            {% if item.external %}target="_blank" rel="noopener noreferrer"{% endif %}
-            {% if is_current %}aria-current="page"{% endif %}
-            class="nav-link font-mono text-xs uppercase tracking-widest text-text-muted hover:text-accent-cyan transition-colors py-1.5 border-b-2 border-transparent"
-          >
-            <span>{{ item.name }}</span>{% if item.external %}<span aria-hidden="true" class="text-accent-cyan ml-1">↗</span>{% endif %}
-          </a>
+          {{ <ui.nav_link item={item} active_path={active_path} /> }}
         {% endfor %}
+        {{ <ui.nav_link item={github_item} active_path={active_path} /> }}
       </nav>
 
-      <div class="flex items-center gap-2.5">
-        <span class="status-chip status-chip-nominal hidden lg:inline-flex items-center gap-2">
-          <span class="status-pulse w-2 h-2 rounded-full bg-accent-emerald inline-block" aria-hidden="true"></span>
-          <span>{{ config.extra.status_label | default(value="AGENTIC_NODE // ONLINE") }}</span>
-        </span>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          data-palette-open
+          aria-haspopup="dialog"
+          aria-controls="command-palette"
+          class="inline-flex items-center gap-2 min-h-[36px] px-3 py-1.5 rounded-[6px] border border-border bg-surface-raised hover:border-accent-cyan text-text-muted hover:text-accent-cyan text-xs transition-colors cursor-pointer"
+        >
+          <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+          <span class="hidden sm:inline">Search</span>
+          <kbd class="hidden sm:inline font-mono text-[10px] px-1.5 py-0.5 rounded border border-border bg-well" data-palette-shortcut>Ctrl K</kbd>
+          <span class="visually-hidden sm:hidden">Search</span>
+        </button>
 
         <button
           type="button"
           data-theme-toggle
-          class="inline-flex items-center gap-2 min-h-[36px] px-3 py-1.5 rounded-[6px] border border-border bg-surface-raised hover:border-accent-cyan text-text-primary hover:text-accent-cyan font-mono text-xs transition-colors cursor-pointer"
+          class="inline-flex items-center gap-2 min-h-[36px] px-3 py-1.5 rounded-[6px] border border-border bg-surface-raised hover:border-accent-cyan text-text-primary hover:text-accent-cyan text-xs transition-colors cursor-pointer"
         >
-          <span class="visually-hidden">Toggle color theme, currently </span>
+          <span class="visually-hidden">Switch colour theme. Current: </span>
           <svg data-theme-icon="sun" aria-hidden="true" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="4"></circle>
             <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path>
@@ -66,7 +49,7 @@
             <rect x="2" y="3" width="20" height="14" rx="2"></rect>
             <path d="M8 21h8m-4-4v4"></path>
           </svg>
-          <span data-theme-label class="uppercase tracking-wider text-[11px]">Auto</span>
+          <span data-theme-label class="sr-only sm:not-sr-only">Auto</span>
         </button>
 
         <button
@@ -74,36 +57,17 @@
           type="button"
           aria-expanded="false"
           aria-controls="mobile-nav-drawer"
-          class="md:hidden inline-flex items-center justify-center min-h-[36px] px-3 py-1.5 rounded-[6px] border border-border bg-surface-raised text-text-primary hover:text-accent-cyan hover:border-accent-cyan font-mono text-xs cursor-pointer"
+          class="md:hidden inline-flex items-center justify-center min-h-[36px] px-3 py-1.5 rounded-[6px] border border-border bg-surface-raised text-text-primary hover:text-accent-cyan hover:border-accent-cyan text-xs cursor-pointer"
         >
-          <span id="mobile-menu-label" class="uppercase tracking-wider text-[11px]">Menu</span>
+          <span id="mobile-menu-label">Menu</span>
         </button>
       </div>
     </div>
 
-    <nav
-      id="mobile-nav-drawer"
-      aria-label="Mobile"
-      class="hidden md:hidden border-t border-border bg-surface-raised px-4 pt-3 pb-4 space-y-2"
-    >
+    <nav id="mobile-nav-drawer" aria-label="Mobile" class="hidden md:hidden border-t border-border bg-surface-raised px-4 pt-3 pb-4 space-y-2">
       {% for item in config.extra.menu_items %}
-        {% set is_current = false %}
-        {% if not item.external %}
-          {% if item.url == "/" and (active_path == "/" or active_path is starting_with(pat="/posts/")) %}
-            {% set is_current = true %}
-          {% elif item.url != "/" and active_path is starting_with(pat=item.url) %}
-            {% set is_current = true %}
-          {% endif %}
-        {% endif %}
-        <a
-          href="{{ item.url | safe }}"
-          {% if item.external %}target="_blank" rel="noopener noreferrer"{% endif %}
-          {% if is_current %}aria-current="page"{% endif %}
-          class="nav-link font-mono text-xs uppercase tracking-widest text-text-primary hover:text-accent-cyan py-2.5 px-3 rounded-[6px] border border-border bg-well flex items-center justify-between"
-        >
-          <span>{{ item.name }}</span>
-          <span class="text-accent-cyan" aria-hidden="true">{% if item.external %}↗{% else %}-&gt;{% endif %}</span>
-        </a>
+        {{ <ui.nav_link item={item} active_path={active_path} mobile={true} /> }}
       {% endfor %}
+      {{ <ui.nav_link item={github_item} active_path={active_path} mobile={true} /> }}
     </nav>
   </header>

@@ -1,85 +1,96 @@
-# MAHDTech Website & Agentic Resume
+# MAHDTech website
 
-Source repository for [mahdtech.com](https://mahdtech.com), built as a zero-Node, 100%-code-defined static engineering blog and interactive resume.
+Source for [mahdtech.com](https://mahdtech.com): a blog and an interactive resume, built from Markdown and YAML with Zola, Tailwind CSS v4 and Typst, and hosted on GitHub Pages.
 
-## Tech Stack
-
-- **Static Site Generator**: [Zola](https://www.getzola.org/) (Rust, Tera v2 components, YAML frontmatter)
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) standalone CLI (`styles/input.css` -> `static/css/custom.css`) with adaptive `light-dark()` tokens
-- **PDF Typesetting**: [Typst](https://typst.app/) (`resume/resume.typ`) generating both Full (`< 5 pages`) and Short (`< 2 pages`) resumes from a single YAML source
-- **Static Search**: [Pagefind](https://pagefind.app/) WASM search index
-- **Toolchain & CI Parity**: [devenv](https://devenv.sh/) (Nix) + `prek` Git hooks
-- **Hosting**: Cloudflare Workers Static Assets (`wrangler.toml`)
-
-## Quickstart
-
-Enter the reproducible Nix shell and start the live-reloading Zola server:
+## Quick start
 
 ```bash
-devenv shell
-zola serve
+devenv shell   # installs tools, builds CSS, PDFs, social cards, exports and the search index
+zola serve     # http://127.0.0.1:1111
 ```
 
-Then open:
+- `/` is the blog. Draft posts only show with `zola serve --drafts`.
+- `/resume/` is the resume, with Full and Short PDF downloads, Auto/Light/Dark themes and a skill filter.
+- Press `Ctrl K` (`⌘K` on macOS) or `/` anywhere for search and commands.
 
-- `http://127.0.0.1:1111/` for the **Blog** (Markdown dispatches with YAML frontmatter)
-- `http://127.0.0.1:1111/resume/` for the **Interactive Resume** (System/Light/Dark theme toggle + Full & Short PDF downloads)
+For live rebuilds of the CSS and generated files while you edit, run `devenv up` instead of `zola serve`.
 
-## Common Commands
+## Editing content
 
-Inside `devenv shell`, the following helper scripts are available:
+Content lives in two places, and you shouldn't need to touch templates to change it.
 
-```bash
-build    # Compile fonts (if missing), Typst PDFs, Tailwind CSS, Zola site, and Pagefind index
-css      # Recompile styles/input.css -> static/css/custom.css
-resumes  # Recompile Full and Short PDF resumes from data/resume.yaml via Typst
-fonts    # Regenerate self-hosted Inter & JetBrains Mono variable WOFF2 fonts
-check    # Run zola check (validates templates, internal links, and anchors)
-```
+| What | Where |
+| --- | --- |
+| Blog posts | `content/posts/<slug>.md` (Markdown with YAML frontmatter) |
+| Resume, name, contact details | `data/resume.yaml` |
+| Site title, menu, description | `config.toml` |
 
-Run the full automated verification and lint suite from outside or inside the shell:
-
-```bash
-devenv --no-tui test
-```
-
-## Writing a Blog Post
-
-Create a Markdown file in `content/posts/<slug>.md` using **YAML frontmatter** (`---`):
+### Writing a post
 
 ```yaml
 ---
-title: "Your Dispatch Title"
+title: "Post title"
 date: 2026-11-14
-description: "Short summary shown on the main blog card and social previews."
+description: "One or two sentences, shown on the blog card and in link previews."
+draft: true            # remove to publish
 taxonomies:
-  tags:
-    - "kubernetes"
-    - "rust"
-  categories:
-    - "Platform Engineering"
+  tags: ["kubernetes", "rust"]
+  categories: ["Platform Engineering"]
 extra:
-  category: "Platform Engineering"
-  image: "/images/posts/zero-node-zola-stack.svg"
-  image_alt: "Accessible description of the post cover illustration"
-  digest: "Optional one-sentence TL;DR rendered in the Agentic Synthesis callout."
-  key_points:
-    - "Optional first key takeaway."
-    - "Optional second key takeaway."
-  github_issue_id: 2
+  category: "Platform Engineering"     # chip on the card and social image
+  image: "/images/posts/my-cover.svg"  # card and header image (16:9)
+  image_alt: "What the image shows"
+  digest: "Optional TL;DR shown at the top of the post."
+  key_points: ["Optional takeaway", "Another takeaway"]
+  github_issue_id: 2                   # optional: show comments from this issue
 ---
-
-Write your Markdown content here...
 ```
 
-When `extra.github_issue_id` is set, comments on that GitHub issue in `MAHDTech/website` are loaded onto the post page automatically.
+A social preview image is generated for every post automatically.
 
-## Updating the Resume (Single Source of Truth)
+### Updating the resume
 
-All resume content lives in `data/resume.yaml`. Neither HTML templates nor Typst layout files contain hardcoded resume prose.
+Edit `data/resume.yaml`. Dates are `YYYY-MM` and an empty `end` means the role is current. Years of experience, role counts, durations and the career timeline are calculated from those dates, and `{years}` in prose is replaced with the computed number.
 
-1. Edit `data/resume.yaml` (identity, metrics, summary, experience entries, or skill categories).
-2. Run `resumes` inside `devenv shell` (or `build`) to regenerate:
-   - `static/resume/Matthew-Duncan-Resume-Full.pdf` (`< 5 pages` target)
-   - `static/resume/Matthew-Duncan-Resume-Short.pdf` (`< 2 pages` target)
-3. Reload `/resume/` in `zola serve` to view the updated web resume immediately.
+The same file feeds the web resume, both PDFs, the resume social card, `/resume.json` ([JSON Resume](https://jsonresume.org/schema)), `/resume.md` and `/llms.txt`. Run `generate` (or keep `devenv up` running) to rebuild them.
+
+## Commands
+
+Available inside `devenv shell`:
+
+| Command | Does |
+| --- | --- |
+| `generate` | Rebuild PDFs, social cards, exports and the search index |
+| `resumes` | Rebuild only the PDFs |
+| `css` | Rebuild `static/css/custom.css` from `styles/input.css` |
+| `fonts` | Regenerate the subsetted WOFF2 fonts |
+| `build` | Production build into `public/` |
+| `devenv test` | Build and verify everything (CI runs this) |
+
+The `tailwind-css` pre-commit hook rebuilds the committed stylesheet when templates, styles or scripts change.
+
+## How it fits together
+
+```text
+content/*.md ─────────┐
+data/resume.yaml ─────┼─▶ Zola (templates/) ─────────▶ HTML
+config.toml ──────────┘
+data/resume.yaml ─▶ Typst (resume/resume.typ) ───────▶ Full and Short PDFs
+posts + resume ───▶ Typst (resume/og.typ) ───────────▶ 1200×630 social cards
+data/resume.yaml ─▶ jaq (resume/export.jq) ──────────▶ resume.json, resume.md
+public/*.html ────▶ Pagefind ────────────────────────▶ full-text search index
+```
+
+Generated files are git-ignored and rebuilt on `devenv shell` and in CI.
+
+## Deployment
+
+`.github/workflows/pages.yaml` runs `devenv test` on every pull request. On `trunk` it also deploys `public/` to GitHub Pages, and it redeploys monthly so computed values stay current.
+
+One-time setup:
+
+1. In the repository settings under **Pages**, set **Source** to **GitHub Actions**.
+2. Point DNS at GitHub Pages: `A` records for `mahdtech.com` to `185.199.108.153`, `185.199.109.153`, `185.199.110.153` and `185.199.111.153`, and a `CNAME` from `www` to `mahdtech.github.io`. If DNS stays on Cloudflare, set these records to DNS only (grey cloud).
+3. Once the certificate is issued, tick **Enforce HTTPS**.
+
+`static/CNAME` keeps the custom domain on each deploy.

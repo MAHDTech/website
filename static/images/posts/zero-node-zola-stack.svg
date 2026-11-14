@@ -37,9 +37,9 @@
   <path d="M885 342H935" stroke="#34D399" stroke-width="2.5"/>
 
   <rect x="940" y="245" width="160" height="195" rx="8" fill="#0B1220" stroke="#34D399" stroke-width="2"/>
-  <text x="1020" y="292" text-anchor="middle" fill="#34D399" font-family="monospace" font-size="17" font-weight="bold">EDGE</text>
+  <text x="1020" y="292" text-anchor="middle" fill="#34D399" font-family="monospace" font-size="17" font-weight="bold">PAGES</text>
   <text x="1020" y="330" text-anchor="middle" fill="#E2E8F0" font-family="monospace" font-size="13">Pagefind Wasm</text>
-  <text x="1020" y="356" text-anchor="middle" fill="#94A3B8" font-family="monospace" font-size="13">CF Workers</text>
+  <text x="1020" y="356" text-anchor="middle" fill="#94A3B8" font-family="monospace" font-size="13">GitHub Pages</text>
   <text x="1020" y="402" text-anchor="middle" fill="#34D399" font-family="monospace" font-size="13">&lt;50ms Build</text>
 
   <text x="100" y="112" fill="#A78BFA" font-family="monospace" font-size="18" letter-spacing="3">DISPATCH // DOCS-AS-CODE &amp; RUST TOOLING</text>

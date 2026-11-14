@@ -1,5 +1,5 @@
 ---
-title: "Resume - Matthew Duncan"
-description: "Interactive agentic engineering dossier and downloadable Full (< 5 pages) & Short (< 2 pages) PDF resumes for Matthew Duncan (MAHDTech)."
+title: "Resume"
+description: "Interactive resume with downloadable full and short PDF editions."
 template: "resume.html"
 ---

@@ -527,9 +527,9 @@ dialog.agent-dialog::backdrop {
 .prose-mahd h2,
 .prose-mahd h3,
 .prose-mahd h4 {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   color: var(--color-text-primary);
-  font-weight: 700;
+  font-weight: 650;
   letter-spacing: -0.02em;
   scroll-margin-top: 5.5rem;
 }
@@ -638,11 +638,9 @@ dialog.agent-dialog::backdrop {
 
 .prose-mahd th {
   background-color: var(--color-well);
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-accent-cyan);
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
 }
 
 .prose-mahd img {
@@ -650,7 +648,210 @@ dialog.agent-dialog::backdrop {
   border: 1px solid var(--color-border);
 }
 
-/* Resume Density Mode (Executive Brief vs Full Dossier on Web) */
+/* ==========================================================================
+   Toggle Controls (state comes from aria-pressed, set by JS)
+   ========================================================================== */
+.segmented {
+  display: inline-flex;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-well);
+  padding: 2px;
+}
+
+.segmented button {
+  min-height: 30px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.segmented button:hover {
+  color: var(--color-text-primary);
+}
+
+.segmented button[aria-pressed="true"] {
+  background-color: var(--color-surface-raised);
+  color: var(--color-accent-cyan);
+  font-weight: 600;
+  box-shadow: var(--card-elevation);
+}
+
+.tag-filter,
+.skill-pill {
+  border: 1px solid var(--color-border);
+  background-color: var(--color-well);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background-color 0.15s;
+}
+
+.tag-filter {
+  min-height: 32px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 5px;
+  font-size: 0.75rem;
+}
+
+.skill-pill {
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.6875rem;
+}
+
+.tag-filter:hover,
+.skill-pill:hover {
+  border-color: var(--color-accent-cyan);
+  color: var(--color-accent-cyan);
+}
+
+.tag-filter[aria-pressed="true"],
+.skill-pill[aria-pressed="true"] {
+  border-color: var(--color-accent-cyan);
+  background-color: var(--color-surface-active);
+  color: var(--color-accent-cyan);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Career Timeline (resume header)
+   ========================================================================== */
+.timeline-seg {
+  position: absolute;
+  inset-block: 5px;
+  min-width: 4px;
+  border-radius: 3px;
+  outline-offset: 2px;
+  transition: filter 0.15s, transform 0.15s;
+}
+
+.timeline-seg + .timeline-seg {
+  margin-inline-start: 1px;
+}
+
+.timeline-seg-0 {
+  background: color-mix(in oklab, var(--color-accent-cyan) 75%, transparent);
+}
+
+.timeline-seg-1 {
+  background: color-mix(in oklab, var(--color-accent-violet) 70%, transparent);
+}
+
+.timeline-seg-2 {
+  background: color-mix(in oklab, var(--color-accent-emerald) 70%, transparent);
+}
+
+.timeline-seg-current {
+  background: linear-gradient(90deg, var(--color-accent-cyan), var(--color-accent-emerald));
+}
+
+.timeline-seg:hover,
+.timeline-seg:focus-visible {
+  filter: brightness(1.15);
+  transform: scaleY(1.15);
+  z-index: 5;
+}
+
+.timeline-tip {
+  position: absolute;
+  inset-block-end: calc(100% + 10px);
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  width: max-content;
+  max-width: 16rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border-strong);
+  background-color: var(--color-surface-raised);
+  box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.45);
+  color: var(--color-text-primary);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  text-align: start;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s;
+}
+
+.timeline-seg:first-child .timeline-tip {
+  translate: -85% 0;
+}
+
+.timeline-seg:last-child .timeline-tip {
+  translate: -15% 0;
+}
+
+.timeline-seg:hover .timeline-tip,
+.timeline-seg:focus-visible .timeline-tip {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ==========================================================================
+   Command Palette (Ctrl/Cmd+K)
+   ========================================================================== */
+dialog.palette-dialog:not([open]) {
+  display: none;
+}
+
+dialog.palette-dialog[open] {
+  margin: 10vh auto auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  width: min(calc(100dvw - 2rem), 40rem);
+  overflow: visible;
+}
+
+dialog.palette-dialog::backdrop {
+  background: rgba(4, 7, 13, 0.6);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.palette-group {
+  padding: 0.75rem 0.75rem 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+[data-palette-item] {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+[data-palette-item] .palette-excerpt {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+}
+
+[data-palette-item] .palette-excerpt mark {
+  background: color-mix(in oklab, var(--color-accent-cyan) 22%, transparent);
+  color: var(--color-text-primary);
+  border-radius: 2px;
+}
+
+[data-palette-item][aria-selected="true"] {
+  background-color: var(--color-surface-active);
+  color: var(--color-accent-cyan);
+}
+
+/* Resume Density Mode (Full vs Short on the web resume) */
 [data-resume-density="short"] [data-density-full] {
   display: none;
 }

@@ -1,7 +1,7 @@
 ---
 title: "Welcome"
 date: 2020-01-01
-description: "Genesis transmission: initializing the MAHDTech engineering blog."
+description: "The first post on the MAHDTech blog."
 aliases:
   - "/2020/01/welcome/"
 taxonomies:
@@ -9,14 +9,12 @@ taxonomies:
     - "meta"
     - "zola"
   categories:
-    - "Dispatches"
+    - "Meta"
 extra:
-  category: "Genesis Log"
+  category: "Meta"
   image: "/images/posts/welcome-dispatch.svg"
-  image_alt: "Origin terminal node schematic for the first MAHDTech dispatch"
-  cover: "welcome.gif"
+  image_alt: "Terminal illustration for the first MAHDTech post"
   github_issue_id: 2
-  digest: "Origin marker from 2020, preserved across the migration from legacy Hugo to the zero-Node Rust + Zola + Typst architecture."
 ---
 
 Now I have another side project to neglect :grin:

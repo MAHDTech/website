@@ -1,6 +1,8 @@
 ---
 title: "Zero-Node Agentic Web Stack: Zola, Tailwind v4, and Single-Source Typst PDFs"
 date: 2026-11-14
+# Drafted by an AI agent: review and rewrite in your own voice, then remove this line.
+draft: true
 description: "Rebuilding mahdtech.com from first principles in Rust, Nix devenv, Tailwind CSS v4, and Typst - 100% code-defined with zero npm_modules."
 taxonomies:
   tags:

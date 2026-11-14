@@ -1,175 +1,116 @@
 (() => {
   "use strict";
 
-  const initPopoverPositioning = () => {
+  // Browsers without CSS anchor positioning get the popover placed by hand.
+  const initDownloadPopover = () => {
     const trigger = document.getElementById("resume-download-btn");
     const popover = document.getElementById("resume-download-popover");
     if (!trigger || !popover) return;
 
-    // Conditionally load popover polyfill only if native Popover API is absent
-    if (!Object.hasOwn(HTMLElement.prototype, "popover")) {
-      import("https://unpkg.com/@oddbird/popover-polyfill@latest/dist/popover.min.js").catch(
-        () => {}
-      );
-    }
-
     const positionFallback = () => {
-      if (typeof CSS !== "undefined" && CSS.supports("position-area", "block-end")) {
-        return;
-      }
-      const trigRect = trigger.getBoundingClientRect();
-      const popRect = popover.getBoundingClientRect();
-      const gap = 8;
-      let top = trigRect.bottom + gap;
-      if (top + popRect.height > window.innerHeight - 12) {
-        top = Math.max(12, trigRect.top - popRect.height - gap);
-      }
-      let left = trigRect.right - popRect.width;
-      left = Math.max(12, Math.min(left, window.innerWidth - popRect.width - 12));
-
+      if (CSS.supports("position-area", "block-end")) return;
+      const t = trigger.getBoundingClientRect();
+      const p = popover.getBoundingClientRect();
+      let top = t.bottom + 8;
+      if (top + p.height > window.innerHeight - 12) top = Math.max(12, t.top - p.height - 8);
+      const left = Math.max(12, Math.min(t.right - p.width, window.innerWidth - p.width - 12));
       popover.style.top = `${Math.round(top)}px`;
       popover.style.left = `${Math.round(left)}px`;
     };
 
     popover.addEventListener("toggle", (event) => {
-      if (event.newState === "open") {
-        positionFallback();
-      }
+      if (event.newState === "open") positionFallback();
     });
-
     window.addEventListener("resize", () => {
-      if (popover.matches(":popover-open, .\\:popover-open")) {
-        positionFallback();
-      }
+      if (popover.matches(":popover-open")) positionFallback();
     });
-
-    popover.querySelectorAll("[data-popover-close]").forEach((link) => {
-      link.addEventListener("click", () => {
-        if (typeof popover.hidePopover === "function") {
-          try {
-            popover.hidePopover();
-          } catch {}
-        }
-      });
-    });
+    popover.querySelectorAll("[data-popover-close]").forEach((link) =>
+      link.addEventListener("click", () => popover.hidePopover?.())
+    );
   };
 
   const initDensityToggle = () => {
     const root = document.getElementById("resume-root");
     const btns = Array.from(document.querySelectorAll("[data-density-choice]"));
-    if (!root || btns.length === 0) return;
-
-    const setDensity = (mode) => {
-      const next = mode === "short" ? "short" : "full";
-      root.setAttribute("data-resume-density", next);
-      btns.forEach((b) => {
-        const active = b.getAttribute("data-density-choice") === next;
-        b.setAttribute("aria-pressed", String(active));
-        b.classList.toggle("bg-surface-raised", active);
-        b.classList.toggle("text-accent-cyan", active);
-        b.classList.toggle("font-semibold", active);
-        b.classList.toggle("text-text-muted", !active);
-      });
-    };
-
-    btns.forEach((b) => {
+    if (!root) return;
+    btns.forEach((b) =>
       b.addEventListener("click", () => {
-        setDensity(b.getAttribute("data-density-choice") || "full");
-      });
-    });
+        const next = b.getAttribute("data-density-choice") === "short" ? "short" : "full";
+        root.setAttribute("data-resume-density", next);
+        btns.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      })
+    );
   };
 
+  // Clicking a skill shows only the roles whose stack or summary mention it.
   const initSkillFilter = () => {
     const skillBtns = Array.from(document.querySelectorAll("[data-skill-filter]"));
     const roleCards = Array.from(document.querySelectorAll("[data-role-card]"));
     const bar = document.getElementById("resume-skill-filter-bar");
     const status = document.getElementById("resume-skill-filter-status");
-    const clearBtn = document.getElementById("resume-skill-filter-clear");
-
     if (skillBtns.length === 0 || roleCards.length === 0) return;
 
     let activeSkill = null;
 
-    const extractTokens = (raw) => {
-      const base = raw.toLowerCase().trim();
-      const parentheticalStripped = base.replace(/\([^)]*\)/g, "").trim();
-      return Array.from(new Set([base, parentheticalStripped].filter((t) => t.length >= 2)));
+    // "Kubernetes (Talos/NKP)" also matches plain "kubernetes".
+    const tokensFor = (label) => {
+      const base = label.toLowerCase().trim();
+      return [...new Set([base, base.replace(/\([^)]*\)/g, "").trim()])].filter((t) => t.length >= 2);
     };
 
-    const applyFilter = (skillLabel) => {
-      activeSkill = activeSkill === skillLabel ? null : skillLabel;
-      const tokens = activeSkill ? extractTokens(activeSkill) : [];
+    const toggle = (skill) => {
+      activeSkill = activeSkill === skill ? null : skill;
+      const tokens = activeSkill ? tokensFor(activeSkill) : [];
       let matched = 0;
-
       roleCards.forEach((card) => {
         const hay = card.getAttribute("data-role-tech") || "";
-        const isMatch =
-          !activeSkill || tokens.some((tok) => hay.includes(tok));
-        card.hidden = !isMatch;
-        if (isMatch) matched += 1;
+        const show = !activeSkill || tokens.some((tok) => hay.includes(tok));
+        card.hidden = !show;
+        if (show) matched += 1;
       });
-
-      skillBtns.forEach((btn) => {
-        const pressed =
-          activeSkill !== null && btn.getAttribute("data-skill-filter") === activeSkill;
-        btn.setAttribute("aria-pressed", String(pressed));
-        btn.classList.toggle("border-accent-cyan", pressed);
-        btn.classList.toggle("bg-surface-active", pressed);
-        btn.classList.toggle("text-accent-cyan", pressed);
-        btn.classList.toggle("font-bold", pressed);
-      });
-
+      skillBtns.forEach((btn) =>
+        btn.setAttribute("aria-pressed", String(activeSkill !== null && btn.getAttribute("data-skill-filter") === activeSkill))
+      );
       if (bar && status) {
         bar.hidden = activeSkill === null;
-        if (activeSkill) {
-          status.textContent = `Showing ${matched} of ${roleCards.length} engagements matching "${activeSkill}"`;
-        }
+        if (activeSkill) status.textContent = `Showing ${matched} of ${roleCards.length} roles that used ${activeSkill}`;
       }
     };
 
-    skillBtns.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const val = btn.getAttribute("data-skill-filter");
-        if (val) applyFilter(val);
-      });
+    skillBtns.forEach((btn) => btn.addEventListener("click", () => toggle(btn.getAttribute("data-skill-filter"))));
+    document.getElementById("resume-skill-filter-clear")?.addEventListener("click", () => {
+      if (activeSkill !== null) toggle(activeSkill);
     });
-
-    if (clearBtn) {
-      clearBtn.addEventListener("click", () => {
-        if (activeSkill !== null) {
-          applyFilter(activeSkill);
-        }
-      });
-    }
   };
 
+  // The agent dialog shows /resume.md, generated from data/resume.yaml.
   const initAgentDialog = () => {
     const trigger = document.getElementById("agent-spec-trigger");
     const dialog = document.getElementById("agent-spec-dialog");
-    const closeBtn = document.getElementById("agent-spec-close");
-    if (!trigger || !dialog) return;
+    const payload = document.getElementById("agent-spec-payload");
+    if (!trigger || !dialog || !payload) return;
+    let loaded = false;
 
-    trigger.addEventListener("click", () => {
-      if (typeof dialog.showModal === "function") {
-        dialog.showModal();
+    trigger.addEventListener("click", async () => {
+      dialog.showModal();
+      if (loaded) return;
+      try {
+        const res = await fetch(payload.dataset.src);
+        if (!res.ok) throw new Error(String(res.status));
+        payload.textContent = await res.text();
+        loaded = true;
+      } catch {
+        payload.textContent = "resume.md isn't available. Run `generate` in the devenv shell to build it.";
       }
     });
-
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        dialog.close();
-      });
-    }
-
+    document.getElementById("agent-spec-close")?.addEventListener("click", () => dialog.close());
     dialog.addEventListener("click", (event) => {
-      if (event.target === dialog) {
-        dialog.close();
-      }
+      if (event.target === dialog) dialog.close();
     });
   };
 
   document.addEventListener("DOMContentLoaded", () => {
-    initPopoverPositioning();
+    initDownloadPopover();
     initDensityToggle();
     initSkillFilter();
     initAgentDialog();

@@ -2,16 +2,13 @@
 
 {% block content %}
 <div class="space-y-8">
-  <div class="flex items-center justify-between gap-4">
-    <a href="/" class="font-mono text-xs text-accent-cyan hover:underline">&lt;- Back to all dispatches</a>
-    <span class="status-chip tabular-nums">{{ term.pages | length }} ENTRIES</span>
-  </div>
+  <a href="/" class="text-sm text-accent-cyan hover:underline">← All posts</a>
 
-  {{ <ui.section_header eyebrow="TOPIC FILTER" title={"#" ~ term.name} summary={"Dispatches tagged with " ~ term.name ~ "."} eyebrow_variant="violet" /> }}
+  {{ <ui.section_header code={"Tag · " ~ (term.pages | length) ~ " posts"} title={"#" ~ term.name} /> }}
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for post in term.pages %}
-      {{ <ui.blog_card post={post} featured={false} eager_image={loop.first} /> }}
+      {{ <ui.blog_card post={post} eager_image={loop.first} /> }}
     {% endfor %}
   </div>
 </div>

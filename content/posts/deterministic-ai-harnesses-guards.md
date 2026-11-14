@@ -1,6 +1,8 @@
 ---
 title: "Deterministic AI Harnesses: Bounding Autonomous Agents in Production"
 date: 2026-11-12
+# Drafted by an AI agent: review and rewrite in your own voice, then remove this line.
+draft: true
 description: "Why unconstrained chat loops fail at repository scale, and how phase-gated contracts, isolated worktrees, and independent verification turn AI agents into reliable engineering spokes."
 taxonomies:
   tags:

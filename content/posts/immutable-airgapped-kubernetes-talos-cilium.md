@@ -1,6 +1,8 @@
 ---
 title: "Immutable Air-Gapped Kubernetes with Talos Linux and Cilium eBPF"
 date: 2026-10-28
+# Drafted by an AI agent: review and rewrite in your own voice, then remove this line.
+draft: true
 description: "Architectural blueprint for operating hardened, SSH-less Kubernetes clusters across disconnected defense and sovereign cloud environments."
 taxonomies:
   tags:
