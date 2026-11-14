@@ -14,6 +14,26 @@ let
     ps.fonttools
     ps.brotli
   ]);
+
+  # What `generate` reads and writes, for the freshness check in enterShell.
+  # Templates count because the search index comes from a full zola build.
+  generateStamp = "${config.devenv.state}/generate.stamp";
+  generateInputs = [
+    "data"
+    "resume"
+    "content"
+    "templates"
+    "config.toml"
+    "devenv.nix"
+  ];
+  generateOutputs = [
+    "static/resume/meta.json"
+    "static/og/site.png"
+    "static/resume.json"
+    "static/resume.md"
+    "static/llms.txt"
+    "static/pagefind/pagefind.js"
+  ];
 in
 {
   packages = with pkgs; [
@@ -192,12 +212,17 @@ in
     pagefind --site "$tmp/site" --output-path static/pagefind --quiet
   '';
 
+  # The stamp is taken before the run starts, so inputs edited mid-run stay newer
+  # than it and the next shell regenerates. A failed run leaves no stamp.
   scripts.generate.exec = ''
     set -euo pipefail
+    mkdir -p "$(dirname "${generateStamp}")"
+    touch "${generateStamp}.pending"
     resumes
     og
     exports
     search
+    mv "${generateStamp}.pending" "${generateStamp}"
   '';
 
   scripts.build.exec = ''
@@ -226,7 +251,13 @@ in
     if [ ! -f static/css/custom.css ] || [ -n "$(find styles templates static/js -newer static/css/custom.css -type f 2>/dev/null | head -1)" ]; then
       css
     fi
-    generate
+    # `generate` takes seconds (Typst, a full zola build, Pagefind), so only run it
+    # when an output is missing or an input changed since the last run.
+    if [ ! -f "${generateStamp}" ] \
+      || [ -n "$(find ${lib.concatStringsSep " " generateInputs} -newer "${generateStamp}" 2>/dev/null | head -1)" ] \
+      || ! ls ${lib.concatStringsSep " " generateOutputs} > /dev/null 2>&1; then
+      generate
+    fi
     echo
     echo "MAHDTech website"
     echo "  zola serve   preview at http://127.0.0.1:1111 (drafts: zola serve --drafts)"
