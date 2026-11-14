@@ -1,26 +1,25 @@
 ---
-title: "Zero-Node Agentic Web Stack: Zola, Tailwind v4, and Single-Source Typst PDFs"
+title: "Building a blog in the Agentic Age."
 date: 2026-11-14
-# Drafted by an AI agent: review and rewrite in your own voice, then remove this line.
 draft: true
-description: "Rebuilding mahdtech.com from first principles in Rust, Nix devenv, Tailwind CSS v4, and Typst - 100% code-defined with zero npm_modules."
+description: "Rebuilding mahdtech.com with Agents."
 taxonomies:
-  tags:
-    - "zola"
-    - "rust"
-    - "nix"
-    - "typst"
-  categories:
-    - "Web Architecture"
+    tags:
+        - "zola"
+        - "rust"
+        - "nix"
+        - "typst"
+    categories:
+        - "Web Architecture"
 extra:
-  category: "Stack Architecture"
-  image: "/images/posts/zero-node-zola-stack.svg"
-  image_alt: "Build pipeline schematic showing YAML data and Markdown compiling through Zola, Tailwind v4, and Typst into static HTML and PDFs"
-  digest: "A personal engineering blog and resume should still build cleanly five years from now. Dropping Node.js bundlers in favor of Zola, standalone Tailwind v4, and Typst inside Nix devenv makes the entire site reproducible in under two seconds."
-  key_points:
-    - "Zero package.json or node_modules: every binary is cryptographically pinned via Nix devenv."
-    - "One data/resume.yaml drives the interactive web dossier and both Full and Short Typst PDFs."
-    - "Modern CSS light-dark(), anchored popovers, and scroll-driven animations replace heavy client frameworks."
+    category: "Stack Architecture"
+    image: "/images/posts/zero-node-zola-stack.svg"
+    image_alt: "Build pipeline schematic showing YAML data and Markdown compiling through Zola, Tailwind v4, and Typst into static HTML and PDFs"
+    digest: "A personal engineering blog and resume should still build cleanly five years from now. Dropping Node.js bundlers in favor of Zola, standalone Tailwind v4, and Typst inside Nix devenv makes the entire site reproducible in under five seconds."
+    key_points:
+        - "Zero package.json or node_modules: every binary is cryptographically pinned via Nix devenv."
+        - "One data/resume.yaml drives the interactive web dossier and both Full and Short Typst PDFs."
+        - "Modern CSS light-dark(), anchored popovers, and scroll-driven animations replace heavy client frameworks."
 ---
 
 ## Why Static Sites Rot
@@ -46,14 +45,14 @@ Instead of duplicating prose, every role, metric, summary statement, and skill c
 ```yaml
 ---
 basics:
-  name: "Matthew Duncan"
-  subtitle: "Senior Platform Engineer"
+    name: "Matthew Duncan"
+    subtitle: "Senior Platform Engineer"
 experience:
-  - company: "Freelance"
-    short_summary: "Platform engineering, Kubernetes modernization, and AI harness systems."
-    highlights:
-      - lead: "Automated"
-        detail: "multi-cluster policy validation across immutable environments."
+    - company: "Freelance"
+      short_summary: "Platform engineering, Kubernetes modernization, and AI harness systems."
+      highlights:
+          - lead: "Automated"
+            detail: "multi-cluster policy validation across immutable environments."
 ```
 
 At build time, two compilers consume that exact YAML tree:
@@ -67,17 +66,17 @@ Browser engines in 2026 natively ship primitives that previously demanded kiloby
 
 ```css
 @supports (color: light-dark(white, black)) {
-  :root {
-    color-scheme: light dark;
-    --canvas: light-dark(#f4f7fb, #060a12);
-    --accent-cyan: light-dark(#0284c7, #06b6d4);
-  }
+    :root {
+        color-scheme: light dark;
+        --canvas: light-dark(#f4f7fb, #060a12);
+        --accent-cyan: light-dark(#0284c7, #06b6d4);
+    }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  @view-transition {
-    navigation: auto;
-  }
+    @view-transition {
+        navigation: auto;
+    }
 }
 ```
 

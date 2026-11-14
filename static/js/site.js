@@ -40,6 +40,8 @@
       const choice = btn.getAttribute("data-theme-choice");
       btn.setAttribute("aria-pressed", String(choice === (override ?? "system")));
     });
+
+    syncGiscusTheme();
   };
 
   const setThemeChoice = (choice) => {
@@ -402,60 +404,44 @@
   };
 
   /* ------------------------------------------------------------------------
-     GitHub issue comments (posts with extra.github_issue_id)
+     giscus comments (templates/macros/ui.html, ui.comments)
+     The script is created here rather than in the template so it starts
+     with the theme the visitor is actually seeing.
      ---------------------------------------------------------------------- */
-  const initGitHubComments = () => {
-    const section = document.querySelector("[data-gh-comments-issue]");
-    const listEl = section?.querySelector("[data-gh-comments-list]");
-    if (!section || !listEl) return;
-    const repo = section.getAttribute("data-gh-comments-repo");
-    const issue = encodeURIComponent(section.getAttribute("data-gh-comments-issue"));
+  const GISCUS_ORIGIN = "https://giscus.app";
 
-    const message = (text) => {
-      const p = document.createElement("p");
-      p.className = "text-xs text-text-muted";
-      p.textContent = text;
-      listEl.replaceChildren(p);
+  const giscusTheme = (container) => {
+    const scheme = getStoredScheme() ?? getSystemScheme();
+    return container.dataset[scheme === "dark" ? "themeDark" : "themeLight"];
+  };
+
+  const syncGiscusTheme = () => {
+    const container = document.querySelector("[data-giscus]");
+    const frame = container?.querySelector("iframe.giscus-frame");
+    if (!frame?.contentWindow) return;
+    frame.contentWindow.postMessage({ giscus: { setConfig: { theme: giscusTheme(container) } } }, GISCUS_ORIGIN);
+  };
+
+  const initGiscus = () => {
+    const container = document.querySelector("[data-giscus]");
+    if (!container) return;
+    const script = document.createElement("script");
+    script.src = `${GISCUS_ORIGIN}/client.js`;
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    for (const [key, value] of Object.entries(container.dataset)) {
+      if (key !== "giscus" && key !== "themeLight" && key !== "themeDark") script.dataset[key] = value;
+    }
+    script.dataset.theme = giscusTheme(container);
+    container.append(script);
+    // The frame's first message means it is ready; resend the theme once in
+    // case it changed while loading. Later messages (resizes) are ignored.
+    const onFirstMessage = (event) => {
+      if (event.origin !== GISCUS_ORIGIN) return;
+      window.removeEventListener("message", onFirstMessage);
+      syncGiscusTheme();
     };
-
-    fetch(`https://api.github.com/repos/${repo}/issues/${issue}/comments`, {
-      headers: { Accept: "application/vnd.github+json" },
-    })
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
-      .then((comments) => {
-        if (!Array.isArray(comments) || comments.length === 0) {
-          message("No comments yet. Start the conversation on GitHub.");
-          return;
-        }
-        listEl.replaceChildren(
-          ...comments.map((c) => {
-            const card = document.createElement("article");
-            card.className = "monolith-well p-4 space-y-2";
-            const header = document.createElement("div");
-            header.className = "flex items-center justify-between gap-2 text-xs";
-            const author = Object.assign(document.createElement("a"), {
-              href: c.user?.html_url || "#",
-              target: "_blank",
-              rel: "noopener noreferrer",
-              className: "font-semibold text-accent-cyan hover:underline",
-              textContent: `@${c.user?.login || "user"}`,
-            });
-            const time = Object.assign(document.createElement("time"), {
-              className: "text-text-muted tabular-nums",
-              dateTime: c.created_at || "",
-              textContent: String(c.created_at || "").slice(0, 10),
-            });
-            const body = Object.assign(document.createElement("p"), {
-              className: "text-sm text-text-primary whitespace-pre-line leading-relaxed",
-              textContent: String(c.body || ""),
-            });
-            header.append(author, time);
-            card.append(header, body);
-            return card;
-          })
-        );
-      })
-      .catch(() => message("Comments couldn't be loaded here. You can read and post them on GitHub."));
+    window.addEventListener("message", onFirstMessage);
   };
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -464,6 +450,6 @@
     initMobileNav();
     initBlogFiltering();
     initCommandPalette();
-    initGitHubComments();
+    initGiscus();
   });
 })();

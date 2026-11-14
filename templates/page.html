@@ -96,25 +96,8 @@
         </nav>
       {% endif %}
 
-      {% if page.extra.github_issue_id is defined %}
-        {% set issue_url = "https://github.com/" ~ config.extra.github_repo ~ "/issues/" ~ page.extra.github_issue_id %}
-        <section
-          data-pagefind-ignore
-          aria-labelledby="comments-heading"
-          data-gh-comments-repo="{{ config.extra.github_repo }}"
-          data-gh-comments-issue="{{ page.extra.github_issue_id }}"
-          class="monolith-card p-6 sm:p-8 space-y-4"
-        >
-          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
-            <h2 id="comments-heading" class="font-semibold text-lg text-text-primary">Comments</h2>
-            <a href="{{ issue_url | safe }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] border border-border bg-well hover:border-accent-cyan text-xs text-accent-cyan transition-colors">
-              Comment on GitHub <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-          <div data-gh-comments-list class="space-y-3 text-sm text-text-muted">
-            <p class="text-xs">Loading comments…</p>
-          </div>
-        </section>
+      {% if config.extra.giscus is defined and page.extra.comments | default(value=true) %}
+        {{ <ui.comments giscus={config.extra.giscus} /> }}
       {% endif %}
     </div>
 

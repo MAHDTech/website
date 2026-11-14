@@ -6,8 +6,8 @@
 }:
 
 let
-  # Fonts used by Typst for the PDFs and social cards. The website serves
-  # subsetted WOFF2 copies of the same fonts (see the `fonts` script).
+  # Fonts used by Typst for the PDFs and social cards.
+  # The website serves subsetted WOFF2 copies of the same fonts (see the `fonts` script).
   typstFonts = "--font-path ${pkgs.inter}/share/fonts/truetype --font-path ${pkgs.jetbrains-mono}/share/fonts/truetype";
 
   fontTools = pkgs.python3.withPackages (ps: [
@@ -16,21 +16,21 @@ let
   ]);
 in
 {
-  packages = [
-    pkgs.zola
-    pkgs.tailwindcss_4
-    pkgs.typst
-    pkgs.pagefind
-    pkgs.jaq
-    pkgs.watchexec
-    pkgs.poppler-utils
-    pkgs.convco
-    pkgs.prek
-    pkgs.nixfmt
-    pkgs.yamllint
-    pkgs.markdownlint-cli
-    pkgs.actionlint
-    pkgs.git
+  packages = with pkgs; [
+    actionlint
+    convco
+    git
+    jaq
+    markdownlint-cli
+    nixfmt
+    pagefind
+    poppler-utils
+    prek
+    tailwindcss_4
+    typst
+    watchexec
+    yamllint
+    zola
   ];
 
   git-hooks = {
@@ -45,8 +45,8 @@ in
         entry = "${pkgs.writeShellScript "terra-templates" config.scripts.terra-templates.exec}";
         files = "^templates/";
       };
-      # Tailwind only emits classes it finds in templates and JS, so the
-      # committed stylesheet must be rebuilt whenever those change.
+      # Tailwind only emits classes it finds in templates and JS.
+      # The committed stylesheet must be rebuilt whenever those change.
       tailwind-css = {
         enable = true;
         name = "tailwind-css";

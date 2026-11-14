@@ -175,3 +175,34 @@
     <p class="text-xs text-text-muted leading-snug">{{ detail }}</p>
   </div>
 {% endcomponent ui.metric %}
+
+{# giscus comments for one page, configured by `config.extra.giscus`.
+   static/js/site.js loads giscus.app/client.js into [data-giscus] with the
+   current theme and keeps it in sync with the theme toggle. #}
+{% component ui.comments(giscus) %}
+  <section data-pagefind-ignore aria-labelledby="comments-heading" class="monolith-card p-6 sm:p-8 space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+      <h2 id="comments-heading" class="font-semibold text-lg text-text-primary">Comments</h2>
+      <p class="text-xs text-text-muted">Sign in with GitHub to comment or react.</p>
+    </div>
+    <div
+      data-giscus
+      data-repo="{{ giscus.repo }}"
+      data-repo-id="{{ giscus.repo_id }}"
+      data-category="{{ giscus.category }}"
+      data-category-id="{{ giscus.category_id }}"
+      data-mapping="{{ giscus.mapping }}"
+      data-strict="1"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="top"
+      data-lang="en"
+      data-loading="lazy"
+      data-theme-light="{{ giscus.theme_light }}"
+      data-theme-dark="{{ giscus.theme_dark }}"
+      class="min-h-24"
+    >
+      <noscript><p class="text-sm text-text-muted">Comments need JavaScript. You can also join in on <a class="text-accent-cyan hover:underline" href="https://github.com/{{ giscus.repo }}/discussions">GitHub Discussions</a>.</p></noscript>
+    </div>
+  </section>
+{% endcomponent ui.comments %}
