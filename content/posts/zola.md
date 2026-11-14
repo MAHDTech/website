@@ -1,8 +1,8 @@
 ---
-title: "Building a blog in the Agentic Age."
+title: "Blogging in the Agentic Age."
 date: 2026-11-14
-draft: true
-description: "Rebuilding mahdtech.com with Agents."
+draft: false
+description: "How I rebuilt mahdtech.com with Agents."
 taxonomies:
     tags:
         - "zola"
@@ -26,19 +26,25 @@ extra:
 
 Most developer blogs do not fail because Markdown goes out of style. They rot because a simple content edit two years later collides with 1,400 transitive `node_modules` dependencies, deprecated Webpack plugins, and broken Sass native bindings.
 
-When revamping **mahdtech.com**, the primary engineering constraint was longevity: **100% defined in code, DRY, fast, and reproducible from two commands**:
+When revamping **mahdtech.com**, the primary engineering constraint I considered was longevity: **100% defined in code, DRY, fast, and reproducible from two commands**:
 
 ```bash
 devenv shell
 zola serve
 ```
 
+Given my past track record with abandoning blogs, this seemed like a great idea :grin:
+
 ## Single-Source-of-Truth Resume Architecture
 
-Maintaining an interactive HTML resume alongside downloadable PDFs usually creates immediate drift: you update a role bullet on the website and forget the LaTeX or Word document, or vice versa. Furthermore, hiring workflows need two distinct lengths:
+Maintaining an interactive HTML resume alongside downloadable PDFs usually creates immediate drift.
+
+You update a role bullet on the website and forget the LaTeX or Word document, or vice versa.
+
+Furthermore, hiring workflows need two distinct lengths:
 
 - **Full Dossier (`< 5 pages`)**: Comprehensive architectural context, metrics, and per-engagement technology stacks for technical hiring managers.
-- **Short Executive Brief (`< 2 pages`)**: High-signal one-page summary for rapid screening.
+- **Short Executive Brief (`< 2 pages`)**: High-signal one-page summary for rapid screening and ATS.
 
 Instead of duplicating prose, every role, metric, summary statement, and skill category lives once in `data/resume.yaml`:
 
@@ -58,7 +64,8 @@ experience:
 At build time, two compilers consume that exact YAML tree:
 
 1. **Zola (`load_data(path="data/resume.yaml")`)** renders `/resume/` with instant client-side Full/Short density toggling, skill-tag cross-filtering across roles, and adaptive Light/Dark theming.
-2. **Typst (`typst compile --input variant=full|short`)** typesets `Matthew-Duncan-Resume-Full.pdf` (3 pages) and `Matthew-Duncan-Resume-Short.pdf` (1 page) using the exact same self-hosted Inter and JetBrains Mono fonts.
+
+2. **Typst (`typst compile --input variant=full|short`)** typesets the PDF files using the exact same self-hosted Inter and JetBrains Mono fonts.
 
 ## Modern Platform CSS Over Client Bloat
 
@@ -80,4 +87,8 @@ Browser engines in 2026 natively ship primitives that previously demanded kiloby
 }
 ```
 
-Combining CSS `light-dark()` tokens with `<meta name="color-scheme">`, native HTML `[popover]` download menus with CSS Anchor Positioning, and Pagefind WASM static indexing delivers an app-like engineering interface with zero framework runtime.
+Dark mode, theme-aware tokens, popover download menus with CSS anchor positioning, Pagefind for static search.
+
+All of it is plain HTML, CSS, and WASM.
+
+It ends up feeling like an app without shipping a framework to get there.
