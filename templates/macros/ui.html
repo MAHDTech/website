@@ -1,0 +1,141 @@
+{% component ui.status_chip(label, variant="nominal", pulse=false) %}
+  {% if variant == "cyan" %}
+    {% set chip_cls = "status-chip-cyan" %}
+    {% set dot_cls = "bg-accent-cyan" %}
+  {% elif variant == "amber" %}
+    {% set chip_cls = "status-chip-amber" %}
+    {% set dot_cls = "bg-accent-amber" %}
+  {% elif variant == "violet" %}
+    {% set chip_cls = "status-chip-violet" %}
+    {% set dot_cls = "bg-accent-violet" %}
+  {% else %}
+    {% set chip_cls = "status-chip-nominal" %}
+    {% set dot_cls = "bg-accent-emerald" %}
+  {% endif %}
+  <span class="status-chip {{ chip_cls }} inline-flex items-center gap-2">
+    {% if pulse %}
+      <span class="status-pulse w-2 h-2 rounded-full {{ dot_cls }} inline-block" aria-hidden="true"></span>
+    {% endif %}
+    <span>{{ label }}</span>
+  </span>
+{% endcomponent ui.status_chip %}
+
+{% component ui.section_header(eyebrow, title, summary="", eyebrow_variant="cyan", heading_id="") %}
+  <div class="border-b border-border pb-5 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+    <div class="space-y-2.5 max-w-2xl">
+      <div>{{ <ui.status_chip label={eyebrow} variant={eyebrow_variant} /> }}</div>
+      <h2{% if heading_id != "" %} id="{{ heading_id }}"{% endif %} class="font-mono font-bold text-2xl sm:text-3xl text-text-primary tracking-tight">
+        {{ title }}
+      </h2>
+    </div>
+    {% if summary != "" %}
+      <p class="text-sm text-text-muted max-w-xl leading-relaxed">
+        {{ summary }}
+      </p>
+    {% endif %}
+  </div>
+{% endcomponent ui.section_header %}
+
+{% component ui.blog_card(post, featured=false, eager_image=false) %}
+  {% set cover_src = post.extra.image | default(value=post.extra.cover | default(value="/images/og-banner.svg")) %}
+  {% if cover_src is not starting_with(pat="/") and cover_src is not starting_with(pat="http") %}
+    {% set cover_src = "/" ~ cover_src %}
+  {% endif %}
+  {% set cover_alt = post.extra.image_alt | default(value="Illustration for " ~ post.title) %}
+  {% set category_label = post.extra.category | default(value="Engineering Dispatch") %}
+  {% if post.taxonomies is defined and post.taxonomies.tags is defined %}
+    {% set tag_list = post.taxonomies.tags %}
+    {% set tags_joined = tag_list | join(sep=",") | lower %}
+  {% else %}
+    {% set tag_list = [] %}
+    {% set tags_joined = "" %}
+  {% endif %}
+  {% set search_blob = (post.title ~ " " ~ (post.description | default(value="")) ~ " " ~ category_label ~ " " ~ tags_joined ~ " " ~ (post.extra.digest | default(value=""))) | lower %}
+
+  <article
+    data-post-card
+    data-post-tags="{{ tags_joined }}"
+    data-post-search="{{ search_blob }}"
+    class="monolith-card scroll-reveal-card overflow-hidden group transition-colors hover:border-accent-cyan {% if featured %}chamfer-reticle grid grid-cols-1 lg:grid-cols-12{% else %}flex flex-col justify-between{% endif %}"
+  >
+    <a
+      href="{{ post.permalink | safe }}"
+      aria-label="Read {{ post.title }}"
+      tabindex="-1"
+      class="{% if featured %}lg:col-span-6 border-b lg:border-b-0 lg:border-r border-border{% else %}border-b border-border{% endif %} block bg-well overflow-hidden relative aspect-[16/9]"
+    >
+      <img
+        src="{{ cover_src | safe }}"
+        alt="{{ cover_alt }}"
+        width="1200"
+        height="675"
+        {% if eager_image %}fetchpriority="high" loading="eager"{% else %}loading="lazy" decoding="async"{% endif %}
+        class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+      >
+    </a>
+
+    <div class="{% if featured %}lg:col-span-6 p-6 sm:p-8{% else %}p-5 sm:p-6 flex-1{% endif %} flex flex-col justify-between gap-5">
+      <div class="space-y-3">
+        <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-text-muted tabular-nums">
+          <span class="status-chip {% if featured %}status-chip-cyan{% else %}status-chip-violet{% endif %}">
+            {% if featured %}LATEST // {% endif %}{{ category_label }}
+          </span>
+          <div class="flex items-center gap-2.5">
+            {% if post.date %}
+              <time datetime="{{ post.date }}">{{ post.date | date(format="%Y-%m-%d") }}</time>
+            {% endif %}
+            {% if post.reading_time %}
+              <span aria-hidden="true">·</span>
+              <span>{{ post.reading_time }} MIN READ</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <h3 class="font-mono font-bold {% if featured %}text-xl sm:text-2xl{% else %}text-lg sm:text-xl{% endif %} text-text-primary tracking-tight group-hover:text-accent-cyan transition-colors">
+          <a href="{{ post.permalink | safe }}" class="hover:underline underline-offset-4">
+            {{ post.title }}
+          </a>
+        </h3>
+
+        {% if post.description %}
+          <p class="text-sm sm:text-[15px] text-text-muted leading-relaxed">
+            {{ post.description }}
+          </p>
+        {% elif post.summary %}
+          <div class="text-sm text-text-muted leading-relaxed">
+            {{ post.summary | safe }}
+          </div>
+        {% endif %}
+
+        {% if post.extra.digest is defined and post.extra.digest != "" %}
+          <div class="monolith-well px-3.5 py-2.5 border-l-2 border-l-accent-cyan text-xs text-text-muted leading-relaxed">
+            <span class="font-mono font-bold text-accent-cyan uppercase tracking-wider">Agent Digest //</span>
+            <span> {{ post.extra.digest }}</span>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="pt-3.5 border-t border-border flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-1.5">
+          {% for tag in tag_list %}
+            <a
+              href="{{ get_taxonomy_url(kind='tags', name=tag) | safe }}"
+              class="px-2 py-0.5 rounded-[4px] bg-well border border-border hover:border-accent-cyan font-mono text-[11px] text-text-muted hover:text-accent-cyan transition-colors"
+            >
+              #{{ tag }}
+            </a>
+          {% endfor %}
+        </div>
+
+        <a
+          href="{{ post.permalink | safe }}"
+          aria-label="Read Dispatch: {{ post.title }}"
+          class="font-mono text-xs font-semibold text-accent-cyan group-hover:text-accent-cyan-bright inline-flex items-center gap-1.5 shrink-0"
+        >
+          <span>Read Dispatch</span>
+          <span aria-hidden="true" class="transition-transform group-hover:translate-x-0.5">-&gt;</span>
+        </a>
+      </div>
+    </div>
+  </article>
+{% endcomponent ui.blog_card %}

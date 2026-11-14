@@ -1,0 +1,443 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+{% set resume = load_data(path="data/resume.yaml") %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": {{ resume.basics.name | json_encode() | safe }},
+  "alternateName": {{ resume.basics.handle | json_encode() | safe }},
+  "jobTitle": {{ resume.basics.subtitle | json_encode() | safe }},
+  "email": {{ ("mailto:" ~ resume.basics.email) | json_encode() | safe }},
+  "url": {{ resume.basics.website | json_encode() | safe }},
+  "sameAs": [{{ resume.basics.github_url | json_encode() | safe }}],
+  "workLocation": {
+    "@type": "Place",
+    "name": {{ resume.basics.location | json_encode() | safe }}
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+{% set resume = load_data(path="data/resume.yaml") %}
+
+<div id="resume-root" data-pagefind-body data-resume-density="full" class="space-y-8">
+  <!-- Agentic Control & Export Bar -->
+  <section data-pagefind-ignore aria-label="Resume display and download controls" class="no-print monolith-card p-4 sm:p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+    <div class="flex flex-wrap items-center gap-3">
+      <!-- Theme Switcher: Defaults to System Auto-Detect -->
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-[11px] uppercase tracking-wider text-text-muted">Theme:</span>
+        <div role="group" aria-label="Color theme preference" class="inline-flex rounded-[6px] border border-border bg-well p-0.5">
+          <button
+            type="button"
+            data-theme-choice="system"
+            aria-pressed="true"
+            class="min-h-[30px] px-2.5 py-1 rounded-[4px] font-mono text-xs cursor-pointer transition-colors bg-surface-raised text-accent-cyan font-semibold"
+          >
+            Auto
+          </button>
+          <button
+            type="button"
+            data-theme-choice="light"
+            aria-pressed="false"
+            class="min-h-[30px] px-2.5 py-1 rounded-[4px] font-mono text-xs cursor-pointer transition-colors text-text-muted hover:text-text-primary"
+          >
+            Light
+          </button>
+          <button
+            type="button"
+            data-theme-choice="dark"
+            aria-pressed="false"
+            class="min-h-[30px] px-2.5 py-1 rounded-[4px] font-mono text-xs cursor-pointer transition-colors text-text-muted hover:text-text-primary"
+          >
+            Dark
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Density Toggle -->
+      <div class="flex items-center gap-2">
+        <span class="font-mono text-[11px] uppercase tracking-wider text-text-muted">View:</span>
+        <div role="group" aria-label="Resume detail density" class="inline-flex rounded-[6px] border border-border bg-well p-0.5">
+          <button
+            type="button"
+            data-density-choice="full"
+            aria-pressed="true"
+            class="min-h-[30px] px-2.5 py-1 rounded-[4px] font-mono text-xs cursor-pointer transition-colors bg-surface-raised text-accent-cyan font-semibold"
+          >
+            Full Dossier
+          </button>
+          <button
+            type="button"
+            data-density-choice="short"
+            aria-pressed="false"
+            class="min-h-[30px] px-2.5 py-1 rounded-[4px] font-mono text-xs cursor-pointer transition-colors text-text-muted hover:text-text-primary"
+          >
+            Executive Brief
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2.5">
+      <button
+        type="button"
+        id="agent-spec-trigger"
+        class="inline-flex items-center gap-2 min-h-[38px] px-3.5 py-2 rounded-[6px] border border-border bg-well hover:border-accent-cyan text-text-primary hover:text-accent-cyan font-mono text-xs uppercase tracking-wider cursor-pointer transition-colors"
+      >
+        <span class="w-2 h-2 rounded-full bg-accent-violet inline-block" aria-hidden="true"></span>
+        <span>Agent Brief</span>
+      </button>
+
+      <!-- Viewport-Aware Popover Download Dropdown (2 Generated PDF Formats) -->
+      <div class="relative inline-block">
+        <button
+          id="resume-download-btn"
+          type="button"
+          popovertarget="resume-download-popover"
+          aria-controls="resume-download-popover"
+          class="inline-flex items-center gap-2.5 min-h-[38px] px-4 py-2 rounded-[6px] border border-accent-cyan bg-accent-cyan text-canvas hover:bg-accent-cyan-bright font-mono font-bold text-xs uppercase tracking-wider cursor-pointer transition-colors glow-cyan"
+        >
+          <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Download Resume</span>
+          <span aria-hidden="true" class="text-[10px]">▾</span>
+        </button>
+
+        <div id="resume-download-popover" popover="auto" class="anchored-popover space-y-2">
+          <div class="px-2.5 py-1.5 border-b border-border flex items-center justify-between">
+            <span class="font-mono text-[11px] font-bold uppercase tracking-wider text-accent-cyan">Generated PDF Editions</span>
+            <span class="font-mono text-[10px] text-text-muted">Typst Vector</span>
+          </div>
+
+          <a
+            href="{{ resume.downloads.full.url | safe }}"
+            download="{{ resume.downloads.full.filename }}"
+            data-popover-close
+            class="block p-3 rounded-[6px] border border-border bg-well hover:border-accent-cyan transition-colors group"
+          >
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono font-bold text-xs text-text-primary group-hover:text-accent-cyan">
+                1. {{ resume.downloads.full.label }}
+              </span>
+              <span class="status-chip status-chip-cyan tabular-nums">{{ resume.downloads.full.badge }}</span>
+            </div>
+            <p class="text-xs text-text-muted mt-1.5 leading-snug">
+              {{ resume.downloads.full.sublabel }}
+            </p>
+          </a>
+
+          <a
+            href="{{ resume.downloads.short.url | safe }}"
+            download="{{ resume.downloads.short.filename }}"
+            data-popover-close
+            class="block p-3 rounded-[6px] border border-border bg-well hover:border-accent-emerald transition-colors group"
+          >
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-mono font-bold text-xs text-text-primary group-hover:text-accent-emerald">
+                2. {{ resume.downloads.short.label }}
+              </span>
+              <span class="status-chip status-chip-nominal tabular-nums">{{ resume.downloads.short.badge }}</span>
+            </div>
+            <p class="text-xs text-text-muted mt-1.5 leading-snug">
+              {{ resume.downloads.short.sublabel }}
+            </p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Identity & Telemetry Hero -->
+  <header class="monolith-card chamfer-reticle p-6 sm:p-8 lg:p-10 space-y-8">
+    <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
+      <div class="space-y-3 max-w-2xl">
+        <div>
+          {{ <ui.status_chip label={resume.basics.status} variant="nominal" pulse={true} /> }}
+        </div>
+        <h1 class="font-mono font-bold text-3xl sm:text-5xl text-text-primary tracking-tight">
+          {{ resume.basics.name }}
+        </h1>
+        <p class="font-mono text-base sm:text-xl text-accent-cyan font-semibold">
+          {{ resume.basics.title }} <span class="text-text-muted font-normal">// {{ resume.basics.subtitle }}</span>
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end gap-2.5 font-mono text-xs">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-[5px] bg-well border border-border text-text-primary">
+          <span class="text-accent-cyan">LOC //</span>
+          <span>{{ resume.basics.location }}</span>
+        </div>
+
+        <button
+          type="button"
+          data-copy-text="{{ resume.basics.email }}"
+          aria-label="Copy email address {{ resume.basics.email }}"
+          class="inline-flex items-center gap-2 px-3 py-1.5 rounded-[5px] bg-well border border-border hover:border-accent-cyan text-text-primary hover:text-accent-cyan cursor-pointer transition-colors"
+        >
+          <span class="text-accent-cyan">MAIL //</span>
+          <span>{{ resume.basics.email }}</span>
+          <span data-copy-label class="px-1.5 py-0.5 rounded-[3px] bg-surface-raised border border-border text-[10px] uppercase text-text-muted">Copy</span>
+        </button>
+
+        <a
+          href="{{ resume.basics.github_url | safe }}"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 px-3 py-1.5 rounded-[5px] bg-well border border-border hover:border-accent-cyan text-text-primary hover:text-accent-cyan transition-colors"
+        >
+          <span class="text-accent-cyan">GITHUB //</span>
+          <span>github.com/{{ resume.basics.github }}</span>
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-2 border-t border-border">
+      {% for metric in resume.metrics %}
+        <div class="monolith-well p-4 space-y-1">
+          <div class="font-mono font-bold text-lg sm:text-xl text-accent-cyan tabular-nums">
+            {{ metric.value }}
+          </div>
+          <div class="font-mono text-xs font-semibold text-text-primary uppercase tracking-wider">
+            {{ metric.label }}
+          </div>
+          <p class="text-xs text-text-muted leading-snug">
+            {{ metric.detail }}
+          </p>
+        </div>
+      {% endfor %}
+    </div>
+  </header>
+
+  <!-- 01 // Engineering Profile -->
+  <section aria-labelledby="resume-profile-heading" class="space-y-5">
+    {{ <ui.section_header eyebrow="01 // PROFILE" title="Architectural & Platform Profile" summary="Core engineering focus across sovereign infrastructure, multi-cloud automation, and deterministic AI tooling." eyebrow_variant="cyan" heading_id="resume-profile-heading" /> }}
+
+    <div data-density-short class="monolith-card p-6 border-l-4 border-l-accent-cyan">
+      <p class="text-base text-text-primary leading-relaxed">
+        {{ resume.profile.executive_summary }}
+      </p>
+    </div>
+
+    <div data-density-full class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for stmt in resume.profile.statements %}
+        <article class="monolith-card p-5 space-y-2.5 border-t-2 border-t-accent-cyan">
+          <h3 class="font-mono text-xs font-bold uppercase tracking-wider text-accent-cyan">
+            {{ stmt.category }}
+          </h3>
+          <p class="text-sm text-text-primary leading-relaxed">
+            {{ stmt.text }}
+          </p>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- 02 // Experience & 03 // Interactive Skills Matrix -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <!-- Left 8 Cols: Career Timeline -->
+    <section aria-labelledby="resume-experience-heading" class="lg:col-span-8 space-y-5">
+      {{ <ui.section_header eyebrow="02 // WORK EXPERIENCE" title="Career Timeline" summary="10 engagements delivering mission-critical infrastructure across Cyber Security, Federal, GitHub, Red Hat, VMware, and Auth0." eyebrow_variant="nominal" heading_id="resume-experience-heading" /> }}
+
+      <div
+        id="resume-skill-filter-bar"
+        hidden
+        class="no-print monolith-well px-4 py-3 border-l-4 border-l-accent-cyan flex flex-wrap items-center justify-between gap-3"
+      >
+        <p id="resume-skill-filter-status" role="status" aria-live="polite" class="font-mono text-xs text-text-primary tabular-nums"></p>
+        <button
+          type="button"
+          id="resume-skill-filter-clear"
+          class="px-3 py-1 rounded-[4px] border border-accent-cyan bg-surface-raised text-accent-cyan font-mono text-xs uppercase tracking-wider cursor-pointer hover:bg-surface-active"
+        >
+          Clear Filter
+        </button>
+      </div>
+
+      <div class="space-y-5">
+        {% for role in resume.experience %}
+          {% set role_tech_blob = (role.tech_stack | join(sep=" ") ~ " " ~ role.short_summary ~ " " ~ role.company ~ " " ~ role.role) | lower %}
+          <article
+            id="{{ role.id }}"
+            data-role-card
+            data-role-tech="{{ role_tech_blob }}"
+            class="monolith-card scroll-reveal-card p-6 sm:p-7 space-y-4 transition-colors hover:border-border-strong"
+          >
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 border-b border-border pb-4">
+              <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-2.5">
+                  {% if role.current %}
+                    <span class="status-pulse w-2.5 h-2.5 rounded-full bg-accent-emerald inline-block" aria-hidden="true"></span>
+                  {% endif %}
+                  <h3 class="font-mono font-bold text-lg sm:text-xl text-text-primary tracking-tight">
+                    {{ role.company }}
+                  </h3>
+                </div>
+                <p class="text-sm sm:text-base font-semibold text-accent-cyan">
+                  {{ role.role }}
+                  <span class="font-mono text-xs font-normal text-text-muted ml-1">({{ role.employment_type }})</span>
+                </p>
+              </div>
+
+              <div class="sm:text-right font-mono text-xs text-text-muted tabular-nums shrink-0 space-y-1">
+                <div class="px-2.5 py-1 rounded-[4px] bg-well border border-border inline-block text-text-primary">
+                  {{ role.period }}
+                </div>
+                <div>{{ role.location }}</div>
+              </div>
+            </div>
+
+            <!-- Executive Brief Summary (Visible when Density = Executive Brief) -->
+            <p data-density-short class="text-sm sm:text-[15px] text-text-primary leading-relaxed">
+              {{ role.short_summary }}
+            </p>
+
+            <!-- Full Detailed Bullets & Notes (Visible when Density = Full Dossier) -->
+            <div data-density-full class="space-y-3.5">
+              <ul class="space-y-2.5">
+                {% for b in role.bullets %}
+                  <li class="flex items-start gap-2.5 text-sm sm:text-[15px] text-text-primary leading-relaxed">
+                    <span class="font-mono text-accent-cyan mt-0.5 shrink-0" aria-hidden="true">▸</span>
+                    <span><strong class="font-semibold text-text-primary">{{ b.verb }}</strong> {{ b.detail }}</span>
+                  </li>
+                {% endfor %}
+              </ul>
+
+              {% if role.note is defined and role.note != "" %}
+                <div class="monolith-well px-4 py-2.5 border-l-2 border-l-accent-amber text-xs sm:text-sm italic text-text-muted leading-relaxed">
+                  <strong class="not-italic font-mono text-xs uppercase tracking-wider text-accent-amber">Note:</strong>
+                  <span> {{ role.note }}</span>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Interactive Per-Role Tech Stack Pills -->
+            <div class="pt-3 border-t border-border flex flex-wrap items-center gap-1.5">
+              <span class="font-mono text-[11px] font-bold uppercase tracking-wider text-text-muted mr-1">Stack:</span>
+              {% for tech in role.tech_stack %}
+                <button
+                  type="button"
+                  data-skill-filter="{{ tech }}"
+                  aria-pressed="false"
+                  class="px-2.5 py-1 rounded-[4px] border border-border bg-well hover:border-accent-cyan text-xs font-mono text-text-muted hover:text-accent-cyan cursor-pointer transition-colors"
+                >
+                  {{ tech }}
+                </button>
+              {% endfor %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <!-- Right 4 Cols: Sticky Skills & Capabilities Matrix -->
+    <aside aria-labelledby="resume-skills-heading" class="lg:col-span-4 lg:sticky lg:top-20 space-y-5">
+      <div class="border-b border-border pb-5 space-y-2.5">
+        <div>{{ <ui.status_chip label="03 // CAPABILITIES" variant="violet" /> }}</div>
+        <h2 id="resume-skills-heading" class="font-mono font-bold text-2xl text-text-primary tracking-tight">
+          Skills Matrix
+        </h2>
+        <p class="no-print text-xs text-text-muted leading-relaxed">
+          Select any capability token below to filter matching engagements across the timeline.
+        </p>
+      </div>
+
+      <div class="space-y-3.5">
+        {% for group in resume.skills %}
+          <section class="monolith-card p-4 space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="font-mono font-bold text-xs uppercase tracking-wider text-text-primary">
+                {{ group.category }}
+              </h3>
+              <span class="status-chip status-chip-cyan">{{ group.code }}</span>
+            </div>
+
+            {% if group.details is defined and group.details | length > 0 %}
+              <ul data-density-full class="space-y-1.5 text-xs text-text-muted leading-relaxed">
+                {% for d in group.details %}
+                  <li class="flex items-start gap-2">
+                    <span class="font-mono text-accent-cyan" aria-hidden="true">•</span>
+                    <span>{{ d }}</span>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+
+            <div class="flex flex-wrap gap-1.5">
+              {% for item in group.items %}
+                <button
+                  type="button"
+                  data-skill-filter="{{ item }}"
+                  aria-pressed="false"
+                  class="px-2.5 py-1 rounded-[4px] border border-border bg-well hover:border-accent-cyan font-mono text-[11px] text-text-primary hover:text-accent-cyan cursor-pointer transition-colors text-left"
+                >
+                  {{ item }}
+                </button>
+              {% endfor %}
+            </div>
+          </section>
+        {% endfor %}
+      </div>
+    </aside>
+  </div>
+
+  <!-- Native Dialog: Machine-Readable Agentic Dossier -->
+  <dialog id="agent-spec-dialog" aria-labelledby="agent-spec-title" class="agent-dialog">
+    <div class="monolith-card p-6 sm:p-7 space-y-4 max-h-[calc(100dvh-2rem)] flex flex-col">
+      <div class="flex items-start justify-between gap-4 border-b border-border pb-4">
+        <div class="space-y-1">
+          <span class="status-chip status-chip-violet">AGENTIC_HANDOFF // MARKDOWN BRIEF</span>
+          <h2 id="agent-spec-title" class="font-mono font-bold text-lg text-text-primary mt-1">
+            LLM &amp; Recruiter Structured Context
+          </h2>
+          <p class="text-xs text-text-muted">
+            Synthesized directly from <code class="font-mono text-accent-cyan">data/resume.yaml</code> at build time.
+          </p>
+        </div>
+        <button
+          type="button"
+          id="agent-spec-close"
+          class="px-3 py-1.5 rounded-[5px] border border-border bg-well hover:border-accent-cyan font-mono text-xs text-text-primary cursor-pointer"
+        >
+          Close
+        </button>
+      </div>
+
+      {% set_global agent_md = "# " ~ resume.basics.name ~ " - " ~ resume.basics.subtitle ~ "\n" %}
+      {% set_global agent_md = agent_md ~ "Location: " ~ resume.basics.location ~ " | Email: " ~ resume.basics.email ~ " | GitHub: " ~ resume.basics.github_url ~ "\n\n" %}
+      {% set_global agent_md = agent_md ~ "## Executive Summary\n" ~ resume.profile.executive_summary ~ "\n\n## Experience\n" %}
+      {% for r in resume.experience %}
+        {% set_global agent_md = agent_md ~ "- **" ~ r.company ~ "** - " ~ r.role ~ " (" ~ r.employment_type ~ ", " ~ r.period ~ ", " ~ r.location ~ "): " ~ r.short_summary ~ " [Stack: " ~ (r.tech_stack | join(sep=", ")) ~ "]\n" %}
+      {% endfor %}
+      {% set_global agent_md = agent_md ~ "\n## Core Skills\n" %}
+      {% for s in resume.skills %}
+        {% set_global agent_md = agent_md ~ "- **" ~ s.category ~ "**: " ~ (s.items | join(sep=", ")) ~ "\n" %}
+      {% endfor %}
+
+      <pre id="agent-spec-payload" class="monolith-well p-4 text-xs font-mono text-text-primary overflow-auto flex-1 whitespace-pre-wrap leading-relaxed">{{ agent_md }}</pre>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-border">
+        <span class="font-mono text-xs text-text-muted">Zero tracking · Copy directly into any AI agent or ATS</span>
+        <button
+          type="button"
+          data-copy-target="agent-spec-payload"
+          class="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-accent-cyan text-canvas font-mono font-bold text-xs uppercase tracking-wider cursor-pointer hover:bg-accent-cyan-bright"
+        >
+          <span data-copy-label>Copy Agent Brief</span>
+        </button>
+      </div>
+    </div>
+  </dialog>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/js/resume.js" defer></script>
+{% endblock %}

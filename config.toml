@@ -1,0 +1,56 @@
+# Authoritative Zola configuration for MAHDTech (https://mahdtech.com)
+base_url = "https://mahdtech.com"
+title = "MAHDTech"
+description = "Engineering dispatches and agentic dossier of Matthew Duncan - Senior Platform Engineer specializing in Kubernetes, immutable infrastructure, Rust, NixOS, and AI Harness Engineering."
+default_language = "en"
+author = "Matthew Duncan"
+
+compile_sass = false
+build_search_index = false
+generate_feeds = true
+feed_filenames = ["atom.xml"]
+
+taxonomies = [
+  { name = "tags", feed = true },
+  { name = "categories", feed = true },
+]
+
+[markdown]
+render_emoji = true
+external_links_target_blank = true
+external_links_no_follow = false
+external_links_no_referrer = true
+smart_punctuation = false
+
+[markdown.highlighting]
+error_on_missing_language = true
+theme = "one-dark-pro"
+
+[extra]
+subtitle = "MAHD about tech"
+author_name = "Matthew Duncan"
+author_handle = "MAHDTech"
+author_role = "Senior Platform & AI Harness Engineer"
+location = "Remote (APAC)"
+contact_email = "matthew.duncan@mahdtech.com"
+github_url = "https://github.com/MAHDTech"
+repository_url = "https://github.com/MAHDTech/website"
+github_repo = "MAHDTech/website"
+logo_path = "/images/logo.svg"
+og_image = "images/og-banner.svg"
+status_label = "AGENTIC_NODE // ONLINE"
+
+[[extra.menu_items]]
+name = "Dispatches"
+url = "/"
+external = false
+
+[[extra.menu_items]]
+name = "Resume"
+url = "/resume/"
+external = false
+
+[[extra.menu_items]]
+name = "GitHub"
+url = "https://github.com/MAHDTech"
+external = true

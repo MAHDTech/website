@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-xl mx-auto py-12">
+  <section class="monolith-card chamfer-reticle p-8 text-center space-y-5">
+    <div class="flex justify-center">
+      {{ <ui.status_chip label="ERR_404 // ROUTE_NOT_FOUND" variant="amber" /> }}
+    </div>
+    <h1 class="font-mono font-bold text-3xl text-text-primary">Signal Lost</h1>
+    <p class="text-sm text-text-muted leading-relaxed">
+      The requested coordinate does not exist in this dispatch index. Return to the primary feed or inspect the agentic resume.
+    </p>
+    <div class="flex flex-wrap justify-center gap-3 pt-2">
+      <a href="/" class="px-4 py-2.5 rounded-[6px] bg-accent-cyan text-canvas font-mono font-bold text-xs uppercase tracking-wider">
+        Return to Dispatches
+      </a>
+      <a href="/resume/" class="px-4 py-2.5 rounded-[6px] border border-border bg-well hover:border-accent-cyan text-text-primary font-mono text-xs uppercase tracking-wider">
+        View Resume
+      </a>
+    </div>
+  </section>
+</div>
+{% endblock %}

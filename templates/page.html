@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block top_overlay %}
+  <div class="reading-progress" aria-hidden="true"></div>
+{% endblock %}
+
+{% block content %}
+{% set cover_src = page.extra.image | default(value=page.extra.cover | default(value="/images/og-banner.svg")) %}
+{% if cover_src is not starting_with(pat="/") and cover_src is not starting_with(pat="http") %}
+  {% set cover_src = "/" ~ cover_src %}
+{% endif %}
+{% set cover_alt = page.extra.image_alt | default(value="Cover illustration for " ~ page.title) %}
+{% set category_label = page.extra.category | default(value="Engineering Dispatch") %}
+
+<div data-pagefind-body class="space-y-8">
+  <nav data-pagefind-ignore aria-label="Breadcrumb" class="font-mono text-xs text-text-muted flex flex-wrap items-center gap-2 border-b border-border pb-3">
+    <a href="/" class="hover:text-accent-cyan transition-colors">DISPATCHES</a>
+    <span class="text-border-strong" aria-hidden="true">/</span>
+    <span class="uppercase">{{ category_label }}</span>
+    <span class="text-border-strong" aria-hidden="true">/</span>
+    <span class="text-accent-cyan truncate max-w-md" aria-current="page">{{ page.title }}</span>
+  </nav>
+
+  <header class="monolith-card overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-12">
+      <div class="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between gap-6">
+        <div class="space-y-4">
+          <div class="flex flex-wrap items-center gap-2.5 font-mono text-xs tabular-nums">
+            {{ <ui.status_chip label={category_label} variant="cyan" /> }}
+            {% if page.date %}
+              <time datetime="{{ page.date }}" class="status-chip">{{ page.date | date(format="%Y-%m-%d") }}</time>
+            {% endif %}
+            {% if page.reading_time %}
+              <span class="status-chip">{{ page.reading_time }} MIN READ</span>
+            {% endif %}
+            {% if page.word_count %}
+              <span class="status-chip">{{ page.word_count }} WORDS</span>
+            {% endif %}
+          </div>
+
+          <h1 class="font-mono font-bold text-2xl sm:text-4xl text-text-primary tracking-tight leading-tight">
+            {{ page.title }}
+          </h1>
+
+          {% if page.description %}
+            <p class="text-base sm:text-lg text-text-muted leading-relaxed">
+              {{ page.description }}
+            </p>
+          {% endif %}
+        </div>
+
+        <div class="pt-4 border-t border-border flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-1.5">
+            {% if page.taxonomies is defined and page.taxonomies.tags is defined %}
+              {% for tag in page.taxonomies.tags %}
+                <a
+                  href="{{ get_taxonomy_url(kind='tags', name=tag) | safe }}"
+                  class="px-2.5 py-1 rounded-[4px] bg-well border border-border hover:border-accent-cyan font-mono text-xs text-text-muted hover:text-accent-cyan transition-colors"
+                >
+                  #{{ tag }}
+                </a>
+              {% endfor %}
+            {% endif %}
+          </div>
+
+          <button
+            type="button"
+            data-copy-text="{{ page.permalink | safe }}"
+            class="inline-flex items-center gap-2 min-h-[34px] px-3 py-1.5 rounded-[5px] border border-border bg-well hover:border-accent-cyan font-mono text-xs text-text-muted hover:text-accent-cyan cursor-pointer transition-colors"
+          >
+            <span data-copy-label>Copy URL</span>
+            <span class="visually-hidden">for {{ page.title }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5 bg-well border-t lg:border-t-0 lg:border-l border-border flex items-center justify-center overflow-hidden">
+        <img
+          src="{{ cover_src | safe }}"
+          alt="{{ cover_alt }}"
+          width="1200"
+          height="675"
+          fetchpriority="high"
+          loading="eager"
+          class="w-full h-full object-cover aspect-[16/9] lg:aspect-auto"
+        >
+      </div>
+    </div>
+  </header>
+
+  {% if page.extra.digest is defined or page.extra.key_points is defined %}
+    <aside aria-label="Agentic summary" class="monolith-card p-5 sm:p-6 border-l-4 border-l-accent-cyan space-y-3">
+      <div class="flex items-center justify-between gap-2">
+        <span class="font-mono text-xs font-bold uppercase tracking-widest text-accent-cyan">
+          // AGENTIC_SYNTHESIS · TL;DR
+        </span>
+        <span class="font-mono text-[11px] text-text-muted">YAML FRONTMATTER EXTRACT</span>
+      </div>
+      {% if page.extra.digest is defined %}
+        <p class="text-sm sm:text-base font-medium text-text-primary leading-relaxed">
+          {{ page.extra.digest }}
+        </p>
+      {% endif %}
+      {% if page.extra.key_points is defined and page.extra.key_points | length > 0 %}
+        <ul class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+          {% for pt in page.extra.key_points %}
+            <li class="monolith-well p-3 text-xs text-text-muted leading-relaxed flex items-start gap-2">
+              <span class="font-mono text-accent-emerald font-bold" aria-hidden="true">▸</span>
+              <span>{{ pt }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </aside>
+  {% endif %}
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <div class="{% if page.toc and page.toc | length > 0 %}lg:col-span-8 xl:col-span-9{% else %}lg:col-span-12 max-w-4xl mx-auto w-full{% endif %} space-y-8 min-w-0">
+      <article class="prose-mahd monolith-card p-6 sm:p-8 lg:p-10">
+        {{ page.content | safe }}
+      </article>
+
+      {% if page.lower or page.higher %}
+        <nav data-pagefind-ignore aria-label="Adjacent dispatches" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {% if page.lower %}
+            <a href="{{ page.lower.permalink | safe }}" class="monolith-card p-5 hover:border-accent-cyan transition-colors group">
+              <span class="font-mono text-[11px] uppercase tracking-widest text-text-muted">&lt;- Older Dispatch</span>
+              <p class="font-mono font-bold text-sm text-text-primary group-hover:text-accent-cyan mt-1.5">{{ page.lower.title }}</p>
+            </a>
+          {% else %}
+            <div></div>
+          {% endif %}
+          {% if page.higher %}
+            <a href="{{ page.higher.permalink | safe }}" class="monolith-card p-5 hover:border-accent-cyan transition-colors group sm:text-right">
+              <span class="font-mono text-[11px] uppercase tracking-widest text-text-muted">Newer Dispatch -&gt;</span>
+              <p class="font-mono font-bold text-sm text-text-primary group-hover:text-accent-cyan mt-1.5">{{ page.higher.title }}</p>
+            </a>
+          {% endif %}
+        </nav>
+      {% endif %}
+
+      {% if page.extra.github_issue_id is defined %}
+        <section
+          data-pagefind-ignore
+          aria-labelledby="gh-comments-heading"
+          data-gh-comments-repo="{{ config.extra.github_repo | default(value='MAHDTech/website') }}"
+          data-gh-comments-issue="{{ page.extra.github_issue_id }}"
+          class="monolith-card p-6 sm:p-8 space-y-4"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+            <h2 id="gh-comments-heading" class="font-mono font-bold text-lg text-text-primary">
+              Discussion // GitHub Issue #{{ page.extra.github_issue_id }}
+            </h2>
+            <a
+              href="https://github.com/{{ config.extra.github_repo | default(value='MAHDTech/website') }}/issues/{{ page.extra.github_issue_id }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[5px] border border-border bg-well hover:border-accent-cyan font-mono text-xs text-accent-cyan transition-colors"
+            >
+              <span>Comment on GitHub</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+          <div data-gh-comments-list class="space-y-3 text-sm text-text-muted">
+            <p class="font-mono text-xs">Loading issue comments...</p>
+          </div>
+        </section>
+      {% endif %}
+    </div>
+
+    {% if page.toc and page.toc | length > 0 %}
+      <aside aria-label="Table of contents" class="lg:col-span-4 xl:col-span-3 lg:sticky lg:top-22 monolith-card p-5 space-y-3">
+        <div class="font-mono text-xs font-bold uppercase tracking-widest text-accent-cyan border-b border-border pb-2.5">
+          // DOCUMENT_OUTLINE
+        </div>
+        <nav aria-label="Article sections">
+          <ul class="space-y-2 text-xs font-mono">
+            {% for h1 in page.toc %}
+              <li class="space-y-1.5">
+                <a href="{{ h1.permalink | safe }}" class="block text-text-muted hover:text-accent-cyan transition-colors leading-snug">
+                  {{ h1.title }}
+                </a>
+                {% if h1.children and h1.children | length > 0 %}
+                  <ul class="pl-3 border-l border-border space-y-1">
+                    {% for h2 in h1.children %}
+                      <li>
+                        <a href="{{ h2.permalink | safe }}" class="block text-text-muted/80 hover:text-accent-cyan transition-colors leading-snug">
+                          {{ h2.title }}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </nav>
+      </aside>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

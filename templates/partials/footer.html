@@ -1,0 +1,31 @@
+  <footer class="site-footer border-t border-border bg-surface-raised mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div class="flex items-center gap-3.5">
+        <img
+          src="{{ config.extra.logo_path | default(value='/images/logo.svg') }}"
+          alt=""
+          aria-hidden="true"
+          width="30"
+          height="30"
+          class="w-7.5 h-7.5 opacity-95"
+        >
+        <div>
+          <p class="font-mono text-text-primary font-bold tracking-tight text-sm">
+            {{ config.title }} <span class="text-text-muted font-normal">// {{ config.extra.author_name | default(value="Matthew Duncan") }}</span>
+          </p>
+          <p class="font-mono text-[11px] text-text-muted mt-0.5">
+            100% Defined in Code · Rust · Zola · Tailwind CSS v4 · Typst · Nix Devenv
+          </p>
+        </div>
+      </div>
+
+      <nav aria-label="Footer" class="flex flex-wrap items-center gap-5 font-mono text-xs text-text-muted">
+        <a href="/" class="hover:text-accent-cyan transition-colors">Dispatches</a>
+        <a href="/resume/" class="hover:text-accent-cyan transition-colors">Agentic Resume</a>
+        <a href="{{ get_url(path='atom.xml', trailing_slash=false) | safe }}" class="hover:text-accent-cyan transition-colors">Atom Feed</a>
+        <a href="{{ config.extra.github_url | default(value='https://github.com/MAHDTech') | safe }}" target="_blank" rel="noopener noreferrer" class="hover:text-accent-cyan transition-colors">
+          GitHub <span aria-hidden="true">↗</span>
+        </a>
+      </nav>
+    </div>
+  </footer>

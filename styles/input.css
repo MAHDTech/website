@@ -1,0 +1,726 @@
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/Inter-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("/fonts/JetBrainsMono-Variable.woff2") format("woff2");
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import "tailwindcss";
+@source not "../static/css/custom.css";
+
+/* ==========================================================================
+   Adaptive Light / Dark Color System (Defaults to System Auto-Detect)
+   ========================================================================== */
+:root {
+  /* Light palette: Architectural Drafting Paper & Cobalt Ink */
+  --raw-canvas-light: #f5f7fb;
+  --raw-well-light: #eaeff7;
+  --raw-raised-light: #ffffff;
+  --raw-active-light: #e2eaf6;
+  --raw-glass-light: rgba(245, 247, 251, 0.86);
+  --raw-border-light: #cbd5e1;
+  --raw-border-strong-light: #94a3b8;
+  --raw-text-primary-light: #0b1220;
+  --raw-text-muted-light: #475569;
+  --raw-cyan-light: #0369a1;
+  --raw-cyan-bright-light: #0284c7;
+  --raw-emerald-light: #047857;
+  --raw-amber-light: #b45309;
+  --raw-violet-light: #6d28d9;
+  --raw-fault-light: #be123c;
+  --raw-scroll-track-light: #e2e8f0;
+  --raw-scroll-thumb-light: #64748b;
+  --raw-card-shadow-light: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px -12px rgba(15, 23, 42, 0.08);
+  --raw-glow-cyan-light: 0 4px 18px rgba(2, 132, 199, 0.16);
+  --raw-grid-line-light: rgba(148, 163, 184, 0.22);
+
+  /* Dark palette: Obsidian Agentic Telemetry */
+  --raw-canvas-dark: #070b12;
+  --raw-well-dark: #04070d;
+  --raw-raised-dark: #0d1424;
+  --raw-active-dark: #152038;
+  --raw-glass-dark: rgba(10, 16, 29, 0.84);
+  --raw-border-dark: #1e2b42;
+  --raw-border-strong-dark: #33486b;
+  --raw-text-primary-dark: #ecf3ff;
+  --raw-text-muted-dark: #93a6c4;
+  --raw-cyan-dark: #38bdf8;
+  --raw-cyan-bright-dark: #7dd3fc;
+  --raw-emerald-dark: #34d399;
+  --raw-amber-dark: #fbbf24;
+  --raw-violet-dark: #a78bfa;
+  --raw-fault-dark: #fb7185;
+  --raw-scroll-track-dark: #0b111e;
+  --raw-scroll-thumb-dark: #475569;
+  --raw-card-shadow-dark: 0 10px 30px -14px rgba(0, 0, 0, 0.65);
+  --raw-glow-cyan-dark: 0 0 22px rgba(56, 189, 248, 0.24);
+  --raw-grid-line-dark: rgba(30, 43, 66, 0.42);
+
+  /* Fallback defaults (light) for browsers without light-dark() */
+  --surface-canvas: var(--raw-canvas-light);
+  --surface-well: var(--raw-well-light);
+  --surface-raised: var(--raw-raised-light);
+  --surface-active: var(--raw-active-light);
+  --surface-glass: var(--raw-glass-light);
+  --border-subtle: var(--raw-border-light);
+  --border-strong: var(--raw-border-strong-light);
+  --ink-primary: var(--raw-text-primary-light);
+  --ink-muted: var(--raw-text-muted-light);
+  --accent-cyan: var(--raw-cyan-light);
+  --accent-cyan-bright: var(--raw-cyan-bright-light);
+  --accent-emerald: var(--raw-emerald-light);
+  --accent-amber: var(--raw-amber-light);
+  --accent-violet: var(--raw-violet-light);
+  --accent-fault: var(--raw-fault-light);
+  --scrollbar-track: var(--raw-scroll-track-light);
+  --scrollbar-thumb: var(--raw-scroll-thumb-light);
+  --card-elevation: var(--raw-card-shadow-light);
+  --glow-cyan-shadow: var(--raw-glow-cyan-light);
+  --grid-line: var(--raw-grid-line-light);
+
+  @media (prefers-color-scheme: dark) {
+    --surface-canvas: var(--raw-canvas-dark);
+    --surface-well: var(--raw-well-dark);
+    --surface-raised: var(--raw-raised-dark);
+    --surface-active: var(--raw-active-dark);
+    --surface-glass: var(--raw-glass-dark);
+    --border-subtle: var(--raw-border-dark);
+    --border-strong: var(--raw-border-strong-dark);
+    --ink-primary: var(--raw-text-primary-dark);
+    --ink-muted: var(--raw-text-muted-dark);
+    --accent-cyan: var(--raw-cyan-dark);
+    --accent-cyan-bright: var(--raw-cyan-bright-dark);
+    --accent-emerald: var(--raw-emerald-dark);
+    --accent-amber: var(--raw-amber-dark);
+    --accent-violet: var(--raw-violet-dark);
+    --accent-fault: var(--raw-fault-dark);
+    --scrollbar-track: var(--raw-scroll-track-dark);
+    --scrollbar-thumb: var(--raw-scroll-thumb-dark);
+    --card-elevation: var(--raw-card-shadow-dark);
+    --glow-cyan-shadow: var(--raw-glow-cyan-dark);
+    --grid-line: var(--raw-grid-line-dark);
+  }
+
+  /* Map <meta name="color-scheme"> override onto :root color-scheme & fallback tokens */
+  color-scheme: light dark;
+
+  &:has(> head > meta[name="color-scheme"][content="dark"]) {
+    color-scheme: dark;
+    --surface-canvas: var(--raw-canvas-dark);
+    --surface-well: var(--raw-well-dark);
+    --surface-raised: var(--raw-raised-dark);
+    --surface-active: var(--raw-active-dark);
+    --surface-glass: var(--raw-glass-dark);
+    --border-subtle: var(--raw-border-dark);
+    --border-strong: var(--raw-border-strong-dark);
+    --ink-primary: var(--raw-text-primary-dark);
+    --ink-muted: var(--raw-text-muted-dark);
+    --accent-cyan: var(--raw-cyan-dark);
+    --accent-cyan-bright: var(--raw-cyan-bright-dark);
+    --accent-emerald: var(--raw-emerald-dark);
+    --accent-amber: var(--raw-amber-dark);
+    --accent-violet: var(--raw-violet-dark);
+    --accent-fault: var(--raw-fault-dark);
+    --scrollbar-track: var(--raw-scroll-track-dark);
+    --scrollbar-thumb: var(--raw-scroll-thumb-dark);
+    --card-elevation: var(--raw-card-shadow-dark);
+    --glow-cyan-shadow: var(--raw-glow-cyan-dark);
+    --grid-line: var(--raw-grid-line-dark);
+  }
+
+  &:has(> head > meta[name="color-scheme"][content="light"]) {
+    color-scheme: light;
+    --surface-canvas: var(--raw-canvas-light);
+    --surface-well: var(--raw-well-light);
+    --surface-raised: var(--raw-raised-light);
+    --surface-active: var(--raw-active-light);
+    --surface-glass: var(--raw-glass-light);
+    --border-subtle: var(--raw-border-light);
+    --border-strong: var(--raw-border-strong-light);
+    --ink-primary: var(--raw-text-primary-light);
+    --ink-muted: var(--raw-text-muted-light);
+    --accent-cyan: var(--raw-cyan-light);
+    --accent-cyan-bright: var(--raw-cyan-bright-light);
+    --accent-emerald: var(--raw-emerald-light);
+    --accent-amber: var(--raw-amber-light);
+    --accent-violet: var(--raw-violet-light);
+    --accent-fault: var(--raw-fault-light);
+    --scrollbar-track: var(--raw-scroll-track-light);
+    --scrollbar-thumb: var(--raw-scroll-thumb-light);
+    --card-elevation: var(--raw-card-shadow-light);
+    --glow-cyan-shadow: var(--raw-glow-cyan-light);
+    --grid-line: var(--raw-grid-line-light);
+  }
+
+  @supports (color: light-dark(white, black)) {
+    --surface-canvas: light-dark(var(--raw-canvas-light), var(--raw-canvas-dark));
+    --surface-well: light-dark(var(--raw-well-light), var(--raw-well-dark));
+    --surface-raised: light-dark(var(--raw-raised-light), var(--raw-raised-dark));
+    --surface-active: light-dark(var(--raw-active-light), var(--raw-active-dark));
+    --surface-glass: light-dark(var(--raw-glass-light), var(--raw-glass-dark));
+    --border-subtle: light-dark(var(--raw-border-light), var(--raw-border-dark));
+    --border-strong: light-dark(var(--raw-border-strong-light), var(--raw-border-strong-dark));
+    --ink-primary: light-dark(var(--raw-text-primary-light), var(--raw-text-primary-dark));
+    --ink-muted: light-dark(var(--raw-text-muted-light), var(--raw-text-muted-dark));
+    --accent-cyan: light-dark(var(--raw-cyan-light), var(--raw-cyan-dark));
+    --accent-cyan-bright: light-dark(var(--raw-cyan-bright-light), var(--raw-cyan-bright-dark));
+    --accent-emerald: light-dark(var(--raw-emerald-light), var(--raw-emerald-dark));
+    --accent-amber: light-dark(var(--raw-amber-light), var(--raw-amber-dark));
+    --accent-violet: light-dark(var(--raw-violet-light), var(--raw-violet-dark));
+    --accent-fault: light-dark(var(--raw-fault-light), var(--raw-fault-dark));
+    --scrollbar-track: light-dark(var(--raw-scroll-track-light), var(--raw-scroll-track-dark));
+    --scrollbar-thumb: light-dark(var(--raw-scroll-thumb-light), var(--raw-scroll-thumb-dark));
+  }
+
+  accent-color: var(--accent-cyan);
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+}
+
+@theme {
+  --color-canvas: var(--surface-canvas);
+  --color-well: var(--surface-well);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-active: var(--surface-active);
+  --color-surface-glass: var(--surface-glass);
+  --color-border: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-text-primary: var(--ink-primary);
+  --color-text-muted: var(--ink-muted);
+  --color-accent-cyan: var(--accent-cyan);
+  --color-accent-cyan-bright: var(--accent-cyan-bright);
+  --color-accent-emerald: var(--accent-emerald);
+  --color-accent-amber: var(--accent-amber);
+  --color-accent-violet: var(--accent-violet);
+  --color-status-nominal: var(--accent-emerald);
+  --color-status-warn: var(--accent-amber);
+  --color-status-fault: var(--accent-fault);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ==========================================================================
+   Cross-Document View Transitions (Progressive Enhancement)
+   ========================================================================== */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+html,
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background-color: color-mix(in oklab, var(--color-accent-cyan) 24%, transparent);
+  color: var(--color-text-primary);
+}
+
+code,
+pre,
+kbd,
+samp,
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Accessible visually-hidden utility (reveals skip links on focus) */
+.visually-hidden:where(:not(:focus-within, :active)) {
+  position: absolute !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* High-contrast focus rings using outline + offset */
+:where(a:any-link, button, input, summary, [tabindex="0"]):focus-visible {
+  outline: 2px solid var(--color-accent-cyan);
+  outline-offset: 3px;
+}
+
+/* Active navigation link indicator (non-color cue + >= 3:1 contrast) */
+.nav-link[aria-current="page"] {
+  color: var(--color-accent-cyan);
+  font-weight: 700;
+  border-bottom: 2px solid var(--color-accent-cyan);
+}
+
+/* ==========================================================================
+   Architectural Surfaces & Reticles
+   ========================================================================== */
+.bg-blueprint-grid {
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.monolith-well {
+  background-color: var(--color-well);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+
+.monolith-card {
+  background-color: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: var(--card-elevation);
+}
+
+.monolith-glass {
+  background-color: var(--color-surface-glass);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.glow-cyan {
+  box-shadow: var(--glow-cyan-shadow);
+}
+
+.chamfer-reticle {
+  position: relative;
+}
+
+.chamfer-reticle::before,
+.chamfer-reticle::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  border-radius: 8px;
+  z-index: 10;
+}
+
+.chamfer-reticle::before {
+  background:
+    linear-gradient(to right, var(--color-accent-cyan) 14px, transparent 14px) 0 0 / 100% 2px no-repeat,
+    linear-gradient(to bottom, var(--color-accent-cyan) 14px, transparent 14px) 0 0 / 2px 100% no-repeat,
+    linear-gradient(to left, var(--color-accent-cyan) 14px, transparent 14px) 100% 0 / 100% 2px no-repeat,
+    linear-gradient(to bottom, var(--color-accent-cyan) 14px, transparent 14px) 100% 0 / 2px 100% no-repeat;
+}
+
+.chamfer-reticle::after {
+  background:
+    linear-gradient(to right, var(--color-accent-cyan) 14px, transparent 14px) 0 100% / 100% 2px no-repeat,
+    linear-gradient(to top, var(--color-accent-cyan) 14px, transparent 14px) 0 100% / 2px 100% no-repeat,
+    linear-gradient(to left, var(--color-accent-cyan) 14px, transparent 14px) 100% 100% / 100% 2px no-repeat,
+    linear-gradient(to top, var(--color-accent-cyan) 14px, transparent 14px) 100% 100% / 2px 100% no-repeat;
+}
+
+/* Telemetry Status Chips */
+.status-chip {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-well);
+}
+
+.status-chip-nominal {
+  color: var(--color-accent-emerald);
+  border-color: color-mix(in oklab, var(--color-accent-emerald) 45%, var(--color-border));
+}
+
+.status-chip-cyan {
+  color: var(--color-accent-cyan);
+  border-color: color-mix(in oklab, var(--color-accent-cyan) 45%, var(--color-border));
+}
+
+.status-chip-amber {
+  color: var(--color-accent-amber);
+  border-color: color-mix(in oklab, var(--color-accent-amber) 45%, var(--color-border));
+}
+
+.status-chip-violet {
+  color: var(--color-accent-violet);
+  border-color: color-mix(in oklab, var(--color-accent-violet) 45%, var(--color-border));
+}
+
+@keyframes status-pulse-anim {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.status-pulse {
+  @media (prefers-reduced-motion: no-preference) {
+    animation: status-pulse-anim 2.4s ease-in-out infinite;
+  }
+}
+
+/* ==========================================================================
+   Scroll-Driven Reading Progress & Entry Reveals (Compositor-Only)
+   ========================================================================== */
+.reading-progress {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    @keyframes progress-scale {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+
+    .reading-progress {
+      display: block;
+      position: fixed;
+      inset-block-start: 0;
+      inset-inline: 0;
+      height: 3px;
+      z-index: 60;
+      transform-origin: 0 50%;
+      background: linear-gradient(90deg, var(--color-accent-cyan), var(--color-accent-emerald));
+      animation: progress-scale auto linear;
+      animation-timeline: scroll(root block);
+    }
+  }
+
+  @supports ((animation-timeline: view()) and (animation-range: entry)) {
+    @keyframes card-reveal-in {
+      from {
+        opacity: 0.35;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .scroll-reveal-card {
+      animation: card-reveal-in auto ease-out backwards;
+      animation-timeline: view();
+      animation-range: entry 0% entry 24%;
+    }
+  }
+}
+
+/* ==========================================================================
+   Viewport-Aware Popover Dropdown & Native Dialog
+   ========================================================================== */
+.anchored-popover[popover] {
+  background-color: var(--color-surface-raised);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.45);
+  padding: 0.5rem;
+  width: min(22rem, calc(100dvw - 1.5rem));
+}
+
+@supports (position-area: block-end) {
+  .anchored-popover[popover] {
+    inset: auto;
+    margin: 0;
+    margin-block-start: 0.5rem;
+    position-area: block-end span-inline-start;
+    position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+  }
+}
+
+@supports not (position-area: block-end) {
+  .anchored-popover[popover] {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .anchored-popover[popover] {
+    opacity: 0;
+    translate: 0 -0.25rem;
+    transition: opacity 0.14s ease-out, translate 0.14s ease-out, display 0.14s, overlay 0.14s;
+    transition-behavior: allow-discrete;
+  }
+
+  .anchored-popover[popover]:is(:popover-open, .\:popover-open) {
+    opacity: 1;
+    translate: 0 0;
+
+    @starting-style {
+      opacity: 0;
+      translate: 0 -0.25rem;
+    }
+  }
+}
+
+dialog.agent-dialog:not([open]) {
+  display: none;
+}
+
+dialog.agent-dialog[open] {
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  width: min(calc(100dvw - 2rem), 46rem);
+  max-height: calc(100dvh - 2rem);
+}
+
+dialog.agent-dialog::backdrop {
+  background: rgba(4, 7, 13, 0.72);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+/* ==========================================================================
+   Markdown Prose Typography (.prose-mahd)
+   ========================================================================== */
+.prose-mahd {
+  color: var(--color-text-primary);
+  line-height: 1.78;
+  font-size: 1.025rem;
+}
+
+.prose-mahd h2,
+.prose-mahd h3,
+.prose-mahd h4 {
+  font-family: var(--font-mono);
+  color: var(--color-text-primary);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  scroll-margin-top: 5.5rem;
+}
+
+.prose-mahd h2 {
+  font-size: 1.45rem;
+  margin-top: 2.4rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.prose-mahd h3 {
+  font-size: 1.15rem;
+  margin-top: 1.8rem;
+  margin-bottom: 0.65rem;
+}
+
+.prose-mahd p,
+.prose-mahd ul,
+.prose-mahd ol,
+.prose-mahd blockquote,
+.prose-mahd pre,
+.prose-mahd table {
+  margin-bottom: 1.3rem;
+}
+
+.prose-mahd ul {
+  list-style-type: disc;
+  padding-inline-start: 1.4rem;
+}
+
+.prose-mahd ol {
+  list-style-type: decimal;
+  padding-inline-start: 1.4rem;
+}
+
+.prose-mahd li + li {
+  margin-top: 0.4rem;
+}
+
+.prose-mahd a {
+  color: var(--color-accent-cyan);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-weight: 500;
+}
+
+.prose-mahd a:hover {
+  color: var(--color-accent-cyan-bright);
+}
+
+.prose-mahd :not(pre) > code {
+  background-color: var(--color-well);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 0.14rem 0.4rem;
+  font-size: 0.86em;
+  color: var(--color-accent-cyan);
+}
+
+.prose-mahd pre {
+  color-scheme: dark;
+  background-color: #0b101b !important;
+  color: #e6f1ff;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  padding: 1.1rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  position: relative;
+}
+
+.prose-mahd pre code {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: inherit;
+}
+
+.prose-mahd blockquote {
+  border-inline-start: 3px solid var(--color-accent-cyan);
+  background-color: var(--color-well);
+  border-radius: 0 6px 6px 0;
+  padding: 0.85rem 1.1rem;
+  color: var(--color-text-muted);
+}
+
+.prose-mahd blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.prose-mahd table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.prose-mahd th,
+.prose-mahd td {
+  border: 1px solid var(--color-border);
+  padding: 0.6rem 0.8rem;
+  text-align: start;
+}
+
+.prose-mahd th {
+  background-color: var(--color-well);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-accent-cyan);
+}
+
+.prose-mahd img {
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+/* Resume Density Mode (Executive Brief vs Full Dossier on Web) */
+[data-resume-density="short"] [data-density-full] {
+  display: none;
+}
+
+[data-resume-density="full"] [data-density-short] {
+  display: none;
+}
+
+/* ==========================================================================
+   High Contrast, Forced Colors & Print Media Support
+   ========================================================================== */
+@media (prefers-contrast: more) {
+  .bg-blueprint-grid {
+    background-image: none !important;
+  }
+  .monolith-glass {
+    backdrop-filter: none !important;
+    background-color: var(--color-surface-raised) !important;
+  }
+  .monolith-card,
+  .monolith-well,
+  .status-chip {
+    border-color: var(--color-text-primary) !important;
+    box-shadow: none !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .monolith-card,
+  .monolith-well,
+  .status-chip,
+  .anchored-popover[popover] {
+    border: 1px solid CanvasText;
+  }
+  .nav-link[aria-current="page"] {
+    border-bottom: 2px solid LinkText;
+  }
+}
+
+@media print {
+  :root {
+    color-scheme: light !important;
+    --surface-canvas: #ffffff !important;
+    --surface-well: #f8fafc !important;
+    --surface-raised: #ffffff !important;
+    --border-subtle: #cbd5e1 !important;
+    --ink-primary: #0f172a !important;
+    --ink-muted: #334155 !important;
+    --accent-cyan: #0369a1 !important;
+  }
+
+  .no-print,
+  header.site-topbar,
+  footer.site-footer,
+  .reading-progress {
+    display: none !important;
+  }
+
+  body,
+  main {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .monolith-card,
+  .monolith-well {
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+}
