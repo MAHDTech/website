@@ -19,167 +19,52 @@
 
 /* ==========================================================================
    Adaptive Light / Dark Color System (Defaults to System Auto-Detect)
+   Each token is light-dark(light, dark) and follows the root color-scheme:
+   the OS preference, unless the theme toggle has written "light" or "dark"
+   into <meta name="color-scheme">. The explicit color-scheme below would
+   otherwise override the meta tag, hence the :has() rules.
    ========================================================================== */
 :root {
-  /* Light palette: Architectural Drafting Paper & Cobalt Ink */
-  --raw-canvas-light: #f5f7fb;
-  --raw-well-light: #eaeff7;
-  --raw-raised-light: #ffffff;
-  --raw-active-light: #e2eaf6;
-  --raw-glass-light: rgba(245, 247, 251, 0.86);
-  --raw-border-light: #cbd5e1;
-  --raw-border-strong-light: #94a3b8;
-  --raw-text-primary-light: #0b1220;
-  --raw-text-muted-light: #475569;
-  --raw-cyan-light: #0369a1;
-  --raw-cyan-bright-light: #0284c7;
-  --raw-emerald-light: #047857;
-  --raw-amber-light: #b45309;
-  --raw-violet-light: #6d28d9;
-  --raw-fault-light: #be123c;
-  --raw-scroll-track-light: #e2e8f0;
-  --raw-scroll-thumb-light: #64748b;
-  --raw-card-shadow-light: 0 1px 3px rgba(15, 23, 42, 0.06), 0 8px 24px -12px rgba(15, 23, 42, 0.08);
-  --raw-glow-cyan-light: 0 4px 18px rgba(2, 132, 199, 0.16);
-  --raw-grid-line-light: rgba(148, 163, 184, 0.22);
-
-  /* Dark palette: Obsidian Agentic Telemetry */
-  --raw-canvas-dark: #070b12;
-  --raw-well-dark: #04070d;
-  --raw-raised-dark: #0d1424;
-  --raw-active-dark: #152038;
-  --raw-glass-dark: rgba(10, 16, 29, 0.84);
-  --raw-border-dark: #1e2b42;
-  --raw-border-strong-dark: #33486b;
-  --raw-text-primary-dark: #ecf3ff;
-  --raw-text-muted-dark: #93a6c4;
-  --raw-cyan-dark: #38bdf8;
-  --raw-cyan-bright-dark: #7dd3fc;
-  --raw-emerald-dark: #34d399;
-  --raw-amber-dark: #fbbf24;
-  --raw-violet-dark: #a78bfa;
-  --raw-fault-dark: #fb7185;
-  --raw-scroll-track-dark: #0b111e;
-  --raw-scroll-thumb-dark: #475569;
-  --raw-card-shadow-dark: 0 10px 30px -14px rgba(0, 0, 0, 0.65);
-  --raw-glow-cyan-dark: 0 0 22px rgba(56, 189, 248, 0.24);
-  --raw-grid-line-dark: rgba(30, 43, 66, 0.42);
-
-  /* Fallback defaults (light) for browsers without light-dark() */
-  --surface-canvas: var(--raw-canvas-light);
-  --surface-well: var(--raw-well-light);
-  --surface-raised: var(--raw-raised-light);
-  --surface-active: var(--raw-active-light);
-  --surface-glass: var(--raw-glass-light);
-  --border-subtle: var(--raw-border-light);
-  --border-strong: var(--raw-border-strong-light);
-  --ink-primary: var(--raw-text-primary-light);
-  --ink-muted: var(--raw-text-muted-light);
-  --accent-cyan: var(--raw-cyan-light);
-  --accent-cyan-bright: var(--raw-cyan-bright-light);
-  --accent-emerald: var(--raw-emerald-light);
-  --accent-amber: var(--raw-amber-light);
-  --accent-violet: var(--raw-violet-light);
-  --accent-fault: var(--raw-fault-light);
-  --scrollbar-track: var(--raw-scroll-track-light);
-  --scrollbar-thumb: var(--raw-scroll-thumb-light);
-  --card-elevation: var(--raw-card-shadow-light);
-  --glow-cyan-shadow: var(--raw-glow-cyan-light);
-  --grid-line: var(--raw-grid-line-light);
-
-  @media (prefers-color-scheme: dark) {
-    --surface-canvas: var(--raw-canvas-dark);
-    --surface-well: var(--raw-well-dark);
-    --surface-raised: var(--raw-raised-dark);
-    --surface-active: var(--raw-active-dark);
-    --surface-glass: var(--raw-glass-dark);
-    --border-subtle: var(--raw-border-dark);
-    --border-strong: var(--raw-border-strong-dark);
-    --ink-primary: var(--raw-text-primary-dark);
-    --ink-muted: var(--raw-text-muted-dark);
-    --accent-cyan: var(--raw-cyan-dark);
-    --accent-cyan-bright: var(--raw-cyan-bright-dark);
-    --accent-emerald: var(--raw-emerald-dark);
-    --accent-amber: var(--raw-amber-dark);
-    --accent-violet: var(--raw-violet-dark);
-    --accent-fault: var(--raw-fault-dark);
-    --scrollbar-track: var(--raw-scroll-track-dark);
-    --scrollbar-thumb: var(--raw-scroll-thumb-dark);
-    --card-elevation: var(--raw-card-shadow-dark);
-    --glow-cyan-shadow: var(--raw-glow-cyan-dark);
-    --grid-line: var(--raw-grid-line-dark);
-  }
-
-  /* Map <meta name="color-scheme"> override onto :root color-scheme & fallback tokens */
   color-scheme: light dark;
 
   &:has(> head > meta[name="color-scheme"][content="dark"]) {
     color-scheme: dark;
-    --surface-canvas: var(--raw-canvas-dark);
-    --surface-well: var(--raw-well-dark);
-    --surface-raised: var(--raw-raised-dark);
-    --surface-active: var(--raw-active-dark);
-    --surface-glass: var(--raw-glass-dark);
-    --border-subtle: var(--raw-border-dark);
-    --border-strong: var(--raw-border-strong-dark);
-    --ink-primary: var(--raw-text-primary-dark);
-    --ink-muted: var(--raw-text-muted-dark);
-    --accent-cyan: var(--raw-cyan-dark);
-    --accent-cyan-bright: var(--raw-cyan-bright-dark);
-    --accent-emerald: var(--raw-emerald-dark);
-    --accent-amber: var(--raw-amber-dark);
-    --accent-violet: var(--raw-violet-dark);
-    --accent-fault: var(--raw-fault-dark);
-    --scrollbar-track: var(--raw-scroll-track-dark);
-    --scrollbar-thumb: var(--raw-scroll-thumb-dark);
-    --card-elevation: var(--raw-card-shadow-dark);
-    --glow-cyan-shadow: var(--raw-glow-cyan-dark);
-    --grid-line: var(--raw-grid-line-dark);
   }
 
   &:has(> head > meta[name="color-scheme"][content="light"]) {
     color-scheme: light;
-    --surface-canvas: var(--raw-canvas-light);
-    --surface-well: var(--raw-well-light);
-    --surface-raised: var(--raw-raised-light);
-    --surface-active: var(--raw-active-light);
-    --surface-glass: var(--raw-glass-light);
-    --border-subtle: var(--raw-border-light);
-    --border-strong: var(--raw-border-strong-light);
-    --ink-primary: var(--raw-text-primary-light);
-    --ink-muted: var(--raw-text-muted-light);
-    --accent-cyan: var(--raw-cyan-light);
-    --accent-cyan-bright: var(--raw-cyan-bright-light);
-    --accent-emerald: var(--raw-emerald-light);
-    --accent-amber: var(--raw-amber-light);
-    --accent-violet: var(--raw-violet-light);
-    --accent-fault: var(--raw-fault-light);
-    --scrollbar-track: var(--raw-scroll-track-light);
-    --scrollbar-thumb: var(--raw-scroll-thumb-light);
-    --card-elevation: var(--raw-card-shadow-light);
-    --glow-cyan-shadow: var(--raw-glow-cyan-light);
-    --grid-line: var(--raw-grid-line-light);
   }
 
-  @supports (color: light-dark(white, black)) {
-    --surface-canvas: light-dark(var(--raw-canvas-light), var(--raw-canvas-dark));
-    --surface-well: light-dark(var(--raw-well-light), var(--raw-well-dark));
-    --surface-raised: light-dark(var(--raw-raised-light), var(--raw-raised-dark));
-    --surface-active: light-dark(var(--raw-active-light), var(--raw-active-dark));
-    --surface-glass: light-dark(var(--raw-glass-light), var(--raw-glass-dark));
-    --border-subtle: light-dark(var(--raw-border-light), var(--raw-border-dark));
-    --border-strong: light-dark(var(--raw-border-strong-light), var(--raw-border-strong-dark));
-    --ink-primary: light-dark(var(--raw-text-primary-light), var(--raw-text-primary-dark));
-    --ink-muted: light-dark(var(--raw-text-muted-light), var(--raw-text-muted-dark));
-    --accent-cyan: light-dark(var(--raw-cyan-light), var(--raw-cyan-dark));
-    --accent-cyan-bright: light-dark(var(--raw-cyan-bright-light), var(--raw-cyan-bright-dark));
-    --accent-emerald: light-dark(var(--raw-emerald-light), var(--raw-emerald-dark));
-    --accent-amber: light-dark(var(--raw-amber-light), var(--raw-amber-dark));
-    --accent-violet: light-dark(var(--raw-violet-light), var(--raw-violet-dark));
-    --accent-fault: light-dark(var(--raw-fault-light), var(--raw-fault-dark));
-    --scrollbar-track: light-dark(var(--raw-scroll-track-light), var(--raw-scroll-track-dark));
-    --scrollbar-thumb: light-dark(var(--raw-scroll-thumb-light), var(--raw-scroll-thumb-dark));
-  }
+  /* Light: Architectural Drafting Paper & Cobalt Ink.
+     Dark: Obsidian Agentic Telemetry. */
+  --surface-canvas: light-dark(#f5f7fb, #070b12);
+  --surface-well: light-dark(#eaeff7, #04070d);
+  --surface-raised: light-dark(#ffffff, #0d1424);
+  --surface-active: light-dark(#e2eaf6, #152038);
+  --surface-glass: light-dark(rgba(245, 247, 251, 0.86), rgba(10, 16, 29, 0.84));
+  --border-subtle: light-dark(#cbd5e1, #1e2b42);
+  --border-strong: light-dark(#94a3b8, #33486b);
+  --ink-primary: light-dark(#0b1220, #ecf3ff);
+  --ink-muted: light-dark(#475569, #93a6c4);
+  --accent-cyan: light-dark(#0369a1, #38bdf8);
+  --accent-cyan-bright: light-dark(#0284c7, #7dd3fc);
+  --accent-emerald: light-dark(#047857, #34d399);
+  --accent-amber: light-dark(#b45309, #fbbf24);
+  --accent-violet: light-dark(#6d28d9, #a78bfa);
+  --accent-fault: light-dark(#be123c, #fb7185);
+  --scrollbar-track: light-dark(#e2e8f0, #0b111e);
+  --scrollbar-thumb: light-dark(#64748b, #475569);
+  --grid-line: light-dark(rgba(148, 163, 184, 0.22), rgba(30, 43, 66, 0.42));
+
+  /* The shadows differ in shape between schemes, so each stacks the layers
+     of both and the other scheme's layers resolve to transparent. */
+  --card-elevation:
+    0 1px 3px light-dark(rgba(15, 23, 42, 0.06), transparent),
+    0 8px 24px -12px light-dark(rgba(15, 23, 42, 0.08), transparent),
+    0 10px 30px -14px light-dark(transparent, rgba(0, 0, 0, 0.65));
+  --glow-cyan-shadow:
+    0 4px 18px light-dark(rgba(2, 132, 199, 0.16), transparent),
+    0 0 22px light-dark(transparent, rgba(56, 189, 248, 0.24));
 
   accent-color: var(--accent-cyan);
   scrollbar-width: thin;
