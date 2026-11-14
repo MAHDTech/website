@@ -59,6 +59,7 @@ in
       nixfmt.enable = true;
       convco.enable = true;
       actionlint.enable = true;
+      ripsecrets.enable = true;
       terra-templates = {
         enable = true;
         name = "terra-templates";
