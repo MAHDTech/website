@@ -17,6 +17,8 @@ taxonomies = [
 
 [markdown]
 
+# Wrap each heading in a link to itself so sections can be shared.
+insert_anchor_links = "heading"
 render_emoji = true
 external_links_target_blank = true
 external_links_no_follow = false

@@ -467,6 +467,25 @@ dialog.agent-dialog::backdrop {
   color: var(--color-accent-cyan-bright);
 }
 
+/* Headings link to themselves (templates/anchor-link.html). Keep them looking
+   like headings; a "#" appears on hover or focus to show they can be linked. */
+.prose-mahd a.heading-anchor,
+.prose-mahd a.heading-anchor:hover {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
+.prose-mahd a.heading-anchor::after {
+  content: "#" / "";
+  margin-left: 0.4em;
+  color: var(--color-accent-cyan);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+.prose-mahd a.heading-anchor:is(:hover, :focus-visible)::after {
+  opacity: 1;
+}
+
 .prose-mahd :not(pre) > code {
   background-color: var(--color-well);
   border: 1px solid var(--color-border);
