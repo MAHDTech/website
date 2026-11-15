@@ -6,9 +6,11 @@
 }:
 
 let
-  # Fonts used by Typst for the PDFs and social cards.
-  # The website serves subsetted WOFF2 copies of the same fonts (see the `fonts` script).
-  typstFonts = "--font-path ${pkgs.inter}/share/fonts/truetype --font-path ${pkgs.jetbrains-mono}/share/fonts/truetype";
+  # Shared Typst flags for the PDFs and social cards.
+  # Fonts: the website serves subsetted WOFF2 copies of the same fonts (see the `fonts` script).
+  # today: devenv sets SOURCE_DATE_EPOCH to 1980, which Typst's datetime.today() honours,
+  # so the real month is passed in for the years-of-experience calculation.
+  typstArgs = "--font-path ${pkgs.inter}/share/fonts/truetype --font-path ${pkgs.jetbrains-mono}/share/fonts/truetype --input today=$(date +%Y-%m)";
 
   fontTools = pkgs.python3.withPackages (ps: [
     ps.fonttools
@@ -161,7 +163,7 @@ in
       mkdir -p static/resume
       for variant in full short; do
         file="$(jaq --from yaml -r ".downloads.$variant.filename" data/resume.yaml)"
-        typst compile --root . ${typstFonts} --input variant="$variant" resume/resume.typ "static/resume/$file"
+        typst compile --root . ${typstArgs} --input variant="$variant" resume/resume.typ "static/resume/$file"
         pages="$(pdfinfo "static/resume/$file" | awk '/^Pages:/ {print $2}')"
         printf '%s\t%s\n' "$variant" "$pages"
       done | jaq -Rn '[inputs | split("\t") | {key: "\(.[0])_pages", value: (.[1] | tonumber)}] | from_entries' > static/resume/meta.json
@@ -171,7 +173,7 @@ in
     # 1200x630 PNG social cards: one per post, plus the site and resume cards.
     og.exec = ''
       set -euo pipefail
-      card() { typst compile --root . ${typstFonts} --ppi 144 "$@"; }
+      card() { typst compile --root . ${typstArgs} --ppi 144 "$@"; }
       mkdir -p static/og
       card --input kind=site resume/og.typ static/og/site.png
       card --input kind=resume resume/og.typ static/og/resume.png

@@ -16,9 +16,16 @@
   int(parts.at(0)) * 12 + int(parts.at(1))
 }
 
+// The build passes `--input today=YYYY-MM` because devenv pins SOURCE_DATE_EPOCH
+// to 1980, which datetime.today() would report. The fallback serves editor previews.
 #let today-months = {
-  let t = datetime.today()
-  t.year() * 12 + t.month()
+  let given = sys.inputs.at("today", default: none)
+  if given != none {
+    to-months(given)
+  } else {
+    let t = datetime.today()
+    t.year() * 12 + t.month()
+  }
 }
 
 #let first-start-months(data) = calc.min(..data.experience.map(r => to-months(r.start)))
