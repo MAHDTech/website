@@ -58,13 +58,8 @@ in
   git-hooks = {
     package = pkgs.prek;
     hooks = {
-      prettier = {
-        enable = true;
-        excludes = [
-          "^static/"
-          "^templates/"
-        ];
-      };
+      # Exclusions live in .prettierignore so the editor honours them too.
+      prettier.enable = true;
       nixfmt.enable = true;
       convco.enable = true;
       actionlint.enable = true;

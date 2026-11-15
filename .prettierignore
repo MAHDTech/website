@@ -1,1 +1,22 @@
+# Read by both the `prettier` hook in devenv.nix and the editor, so every
+# exclusion lives here.
+
+# Tera templates: Prettier's HTML parser rewrites component calls such as
+# `{{ <ui.chip label={x} /> }}` into invalid templates.
 templates/
+
+# Built by the `css` script and committed minified.
+static/css/custom.css
+
+# Built by the `generate` and `build` scripts; ignored by Git.
+public/
+static/resume/
+static/og/
+static/pagefind/
+static/resume.json
+static/resume.md
+static/llms.txt
+
+# Written by devenv.
+devenv.lock
+.pre-commit-config.yaml
