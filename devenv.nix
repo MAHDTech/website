@@ -246,7 +246,7 @@ in
   # `devenv up`: zola serve plus watchers that rebuild CSS and generated files.
   # Skipped under `devenv test`, which would otherwise start them alongside the build.
   processes = lib.mkIf (!config.devenv.isTesting) {
-    zola.exec = "zola serve --port 3000 --drafts";
+    zola.exec = "zola serve --port 3000 --drafts --debounce 5000";
     tailwind.exec = "tailwindcss -i styles/input.css -o static/css/custom.css --minify --watch=always";
     generate.exec = "watchexec --postpone --debounce 1s --watch data --watch resume --watch content --watch config.toml -- generate";
   };
