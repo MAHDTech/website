@@ -6,7 +6,9 @@
 #   resume/og.typ          -> social preview cards
 #   resume/*.jq            -> /resume.json, /resume.md, /llms.txt
 # Dates are "YYYY-MM"; an empty `end` means the role is current.
-# Years of experience and role counts are computed from `experience`,
+# Add `hidden: true` to a role to keep it here but leave it out of every
+# rendered output (it defaults to false, so roles are shown unless marked).
+# Years of experience and role counts are computed from visible `experience`,
 # and "{years}" inside prose is replaced with that computed value.
 
 basics:

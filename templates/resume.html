@@ -23,11 +23,15 @@
 {% set pdf_meta = load_data(path="static/resume/meta.json", required=false) %}
 
 {# ---- Derived facts: everything below is computed from `experience` ---- #}
+{# Roles with `hidden: true` are skipped in every loop, so they add nothing to the counts, years or timeline. #}
 {% set now_m = (now() | date(format="%Y") | int) * 12 + (now() | date(format="%m") | int) %}
 {% set_global first_m = now_m %}
 {% set_global org_seen = "|" %}
 {% set_global org_count = 0 %}
+{% set_global role_count = 0 %}
 {% for role in resume.experience %}
+  {% if role.hidden is defined and role.hidden %}{% continue %}{% endif %}
+  {% set_global role_count = role_count + 1 %}
   {% set parts = role.start | split(pat="-") %}
   {% set s_m = (parts[0] | int) * 12 + (parts[1] | int) %}
   {% if s_m < first_m %}{% set_global first_m = s_m %}{% endif %}
@@ -115,7 +119,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-6 border-t border-border">
       {{ <ui.metric value={years ~ "+ years"} label="Platform & SRE" detail={"Since " ~ first_year ~ ", across federal and global tech"} /> }}
-      {{ <ui.metric value={(resume.experience | length) ~ " roles"} label="Delivered" detail={"With " ~ org_count ~ " organisations, from GitHub and Red Hat to federal agencies"} /> }}
+      {{ <ui.metric value={role_count ~ " roles"} label="Delivered" detail={"With " ~ org_count ~ " organisations, from GitHub and Red Hat to federal agencies"} /> }}
       {% for h in resume.highlights %}
         {{ <ui.metric value={h.value} label={h.label} detail={h.detail} /> }}
       {% endfor %}
@@ -124,7 +128,9 @@
     {# Career timeline: each role drawn to scale between the first start date and today. #}
     <div data-pagefind-ignore class="space-y-2" aria-label="Career timeline">
       <div class="relative h-9 rounded-[6px] bg-well border border-border">
+        {% set_global seg_i = 0 %}
         {% for role in resume.experience %}
+          {% if role.hidden is defined and role.hidden %}{% continue %}{% endif %}
           {% set sp = role.start | split(pat="-") %}
           {% set s_m = (sp[0] | int) * 12 + (sp[1] | int) %}
           {% if role.end == "" %}
@@ -136,7 +142,7 @@
           <a
             href="#{{ role.id }}"
             aria-label="{{ role.company }}, {{ role.role }}"
-            class="timeline-seg timeline-seg-{{ loop.index0 % 3 }}{% if role.end == '' %} timeline-seg-current{% endif %}"
+            class="timeline-seg timeline-seg-{{ seg_i % 3 }}{% if role.end == '' %} timeline-seg-current{% endif %}"
             style="left: {{ (100 * (s_m - first_m) / span_m) | round(precision=3) }}%; width: {{ (100 * (e_m - s_m) / span_m) | round(precision=3) }}%"
           >
             <span class="timeline-tip" role="tooltip">
@@ -144,6 +150,7 @@
               <span class="tabular-nums">{{ <ui.period start={role.start} end={role.end} /> }} · {{ <ui.duration months={e_m - s_m} /> }}</span>
             </span>
           </a>
+          {% set_global seg_i = seg_i + 1 %}
         {% endfor %}
       </div>
       <div class="relative h-4 font-mono text-[10px] text-text-muted tabular-nums" aria-hidden="true">
@@ -169,7 +176,7 @@
 
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
     <section aria-labelledby="resume-experience-heading" class="lg:col-span-8 space-y-5">
-      {{ <ui.section_header code="02 · Experience" title="Experience" summary={(resume.experience | length) ~ " roles since " ~ first_year ~ ". Select a skill to filter them."} heading_id="resume-experience-heading" /> }}
+      {{ <ui.section_header code="02 · Experience" title="Experience" summary={role_count ~ " roles since " ~ first_year ~ ". Select a skill to filter them."} heading_id="resume-experience-heading" /> }}
 
       <div id="resume-skill-filter-bar" hidden class="no-print monolith-well px-4 py-3 border-l-4 border-l-accent-cyan flex flex-wrap items-center justify-between gap-3">
         <p id="resume-skill-filter-status" role="status" aria-live="polite" class="text-sm text-text-primary tabular-nums"></p>
@@ -178,6 +185,7 @@
 
       <div class="space-y-5">
         {% for role in resume.experience %}
+          {% if role.hidden is defined and role.hidden %}{% continue %}{% endif %}
           {% set role_tech_blob = (role.tech_stack | join(sep=" ") ~ " " ~ role.short_summary ~ " " ~ role.company ~ " " ~ role.role) | lower %}
           <article id="{{ role.id }}" data-role-card data-role-tech="{{ role_tech_blob }}" class="monolith-card scroll-reveal-card p-6 sm:p-7 space-y-4 scroll-mt-24 transition-colors hover:border-border-strong">
             <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 border-b border-border pb-4">
@@ -260,10 +268,10 @@
         <div class="space-y-1">
           <h2 id="agent-spec-title" class="font-semibold text-lg text-text-primary">Resume for AI agents</h2>
           <p class="text-sm text-text-muted">
-            Machine-readable copies, generated from <code class="font-mono text-accent-cyan">data/resume.yaml</code> on every build:
-            <a href="/resume.md" class="text-accent-cyan underline underline-offset-2">Markdown</a>,
-            <a href="/resume.json" class="text-accent-cyan underline underline-offset-2">JSON Resume</a> and
-            <a href="/llms.txt" class="text-accent-cyan underline underline-offset-2">llms.txt</a>.
+            For the AI overlords, machine readable copies generated on every build:
+            <br/>- <a href="/resume.md" class="text-accent-cyan underline underline-offset-2">Markdown</a>
+            <br/>- <a href="/resume.json" class="text-accent-cyan underline underline-offset-2">JSON</a>
+            <br/>- <a href="/llms.txt" class="text-accent-cyan underline underline-offset-2">llms.txt</a>
           </p>
         </div>
         <button type="button" id="agent-spec-close" class="px-3 py-1.5 rounded-[5px] border border-border bg-well hover:border-accent-cyan text-xs text-text-primary cursor-pointer">Close</button>

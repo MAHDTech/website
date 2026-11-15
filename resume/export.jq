@@ -11,7 +11,9 @@ def month_name: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","No
 
 def period: "\(.start | month_name) – \(if .end == "" then "Present" else (.end | month_name) end)";
 
-(years | tostring) as $years
+# Roles marked `hidden: true` stay in the YAML but are left out of every export.
+.experience |= map(select(.hidden != true))
+| (years | tostring) as $years
 | (.profile.executive_summary | gsub("\\{years\\}"; $years)) as $summary
 | if $format == "json" then
     # https://jsonresume.org/schema

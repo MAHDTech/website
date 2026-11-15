@@ -2,7 +2,13 @@
 // The web resume (templates/resume.html) and resume/*.jq derive the same
 // values from data/resume.yaml; keep the rules in step if you change them.
 
-#let resume-data = yaml("/data/resume.yaml")
+// Roles marked `hidden: true` stay in the YAML but are dropped here, so the
+// PDFs, social cards, years and role counts never see them.
+#let resume-data = {
+  let data = yaml("/data/resume.yaml")
+  data.experience = data.experience.filter(r => not r.at("hidden", default: false))
+  data
+}
 
 // "2023-07" -> months since year 0, so ranges are a simple subtraction.
 #let to-months(ym) = {

@@ -313,6 +313,14 @@ in
         exit 1
       fi
     done
+    visible_roles="$(jaq --from yaml '[.experience[] | select(.hidden != true)] | length' data/resume.yaml)"
+    test "$(jaq '.work | length' public/resume.json)" -eq "$visible_roles"
+    for id in $(jaq --from yaml -r '.experience[] | select(.hidden == true) | .id' data/resume.yaml); do
+      if grep -rqF "$id" public --include='*.html'; then
+        echo "hidden role was published: $id" >&2
+        exit 1
+      fi
+    done
 
     prek run --all-files
   '';

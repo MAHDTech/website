@@ -54,6 +54,7 @@ Edit `data/resume.yaml`.
 
 - Dates are `YYYY-MM` and an empty `end` means the role is current.
 - Years of experience, role counts, durations and the career timeline are calculated from those dates, and `{years}` in prose is replaced with the computed number.
+- Add `hidden: true` to a role to keep it in the file but leave it off the site, both PDFs and the exports. Hidden roles don't count towards the years, role counts or timeline.
 
 The same file feeds the web resume, both PDFs, the resume social card, `/resume.json` ([JSON Resume](https://jsonresume.org/schema)), `/resume.md` and `/llms.txt`.
 
