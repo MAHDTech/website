@@ -50,6 +50,7 @@ in
     poppler-utils
     prek
     tailwindcss_4
+    trivy
     typst
     watchexec
     yamllint
