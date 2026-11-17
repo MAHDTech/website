@@ -36,6 +36,7 @@ pagefind
 popovertarget
 prek
 Pulumi
+SecOps
 Sigstore
 siwa
 statix

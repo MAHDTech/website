@@ -1,0 +1,67 @@
+---
+name: Deploy
+
+# trunk: build, verify, then publish to GitHub Pages.
+# Monthly schedule: redeploy so computed facts (years of experience) stay current.
+on:
+  push:
+    branches:
+      - trunk
+  schedule:
+    - cron: "0 0 1 * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  actions: read
+  pages: write
+  id-token: write
+
+# Never cancel a deployment part-way; queue the next one instead.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Site
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy_to_gh_pages.outputs.page_url }}
+    steps:
+      - id: setup_consumer
+        name: Set Up Consumer
+        uses: tars-cloud/actions/composite/setup-consumer@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+
+      # `devenv test` runs `build` and verifies public/ before anything is published.
+      - id: build_site
+        name: Build and Verify Site
+        uses: tars-cloud/actions/composite/run-devenv@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+        env:
+          # Years of experience come from the current month in Sydney.
+          TZ: "Australia/Sydney"
+        with:
+          mode: test
+          run: ":"
+
+      - id: upload_pages_artifact
+        name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: ./public
+
+      - id: deploy_to_gh_pages
+        name: Deploy to GH Pages
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+      - id: report_status
+        name: Report Deployment Status
+        if: always()
+        uses: tars-cloud/actions/composite/report-status@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+        with:
+          title: Deployment Results
+          results: |
+            build-site=${{ steps.build_site.outcome }}
+            deploy-pages=${{ steps.deploy_to_gh_pages.outcome }}

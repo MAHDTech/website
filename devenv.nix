@@ -354,7 +354,5 @@ in
         exit 1
       fi
     done
-
-    prek run --all-files
   '';
 }

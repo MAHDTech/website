@@ -12,11 +12,9 @@ updates:
     assignees:
       - "MAHDTech"
     labels:
-      - "dependencies"
-      - "dependabot"
-      - "actions"
+      - "chore"
     target-branch: "trunk"
     commit-message:
-      prefix: "ci"
+      prefix: "chore(deps)"
     rebase-strategy: "auto"
     open-pull-requests-limit: 5
