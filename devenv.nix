@@ -40,7 +40,8 @@ in
 {
   packages = with pkgs; [
     actionlint
-    convco
+    # TODO: re-enable once convco builds again; libgit2-sys fails to find libgit2 in current nixpkgs.
+    # convco
     git
     jaq
     markdownlint-cli
@@ -61,16 +62,44 @@ in
       # Exclusions live in .prettierignore so the editor honours them too.
       prettier.enable = true;
       nixfmt.enable = true;
-      convco.enable = true;
+      # TODO: re-enable once convco builds again; libgit2-sys fails to find libgit2 in current nixpkgs.
+      convco.enable = false;
       actionlint.enable = true;
       ripsecrets.enable = true;
+      statix.enable = true;
+      deadnix.enable = true;
+      typstyle.enable = true;
+      check-merge-conflicts.enable = true;
+      check-added-large-files.enable = true;
+      # Tailwind and devenv write these without a trailing newline.
+      end-of-file-fixer = {
+        enable = true;
+        excludes = [
+          "^static/css/custom\\.css$"
+          "^devenv\\.lock$"
+        ];
+      };
+      trim-trailing-whitespace.enable = true;
+      # Accepts UK and US spelling; see .cspell.yaml and project-words.txt.
+      cspell = {
+        enable = true;
+        entry = "${pkgs.cspell}/bin/cspell --no-progress --no-summary --no-must-find-files";
+      };
+      # Offline: `build` checks external links.
+      zola-check = {
+        enable = true;
+        name = "zola-check";
+        entry = "${pkgs.zola}/bin/zola check --skip-external-links";
+        files = "^(content/|templates/|config\\.toml$)";
+        pass_filenames = false;
+      };
       terra-templates = {
         enable = true;
         name = "terra-templates";
         entry = "${pkgs.writeShellScript "terra-templates" config.scripts.terra-templates.exec}";
         files = "^templates/";
       };
-      # Tailwind only emits classes it finds in templates and JS.
+      # Tailwind only emits classes it finds in templates and JS (see the @source lines in styles/input.css).
       # The committed stylesheet must be rebuilt whenever those change.
       tailwind-css = {
         enable = true;
@@ -276,6 +305,7 @@ in
 
   enterTest = ''
     set -euo pipefail
+    # Before `build`, which rebuilds the stylesheet and would hide a stale commit.
     css-check
     test "$(head -c 4 static/fonts/Inter-Variable.woff2)" = "wOF2"
     test "$(head -c 4 static/fonts/JetBrainsMono-Variable.woff2)" = "wOF2"
@@ -288,9 +318,7 @@ in
     test "$full_pages" -ge 1 && test "$full_pages" -lt 5
     test "$short_pages" -ge 1 && test "$short_pages" -lt 2
 
-    terra-templates templates
-
-    for f in index.html 404.html resume/index.html 2020/01/welcome/index.html CNAME \
+    for f in index.html 404.html resume/index.html posts/welcome/index.html CNAME \
       og/site.png og/resume.png og/posts/welcome.png \
       resume.json resume.md llms.txt pagefind/pagefind.js; do
       test -s "public/$f" || { echo "missing: public/$f" >&2; exit 1; }

@@ -29,14 +29,25 @@
 // Blueprint grid and accent strip shared by every card.
 #let backdrop = {
   for x in range(0, 600, step: 24) {
-    place(dx: x * 1pt, line(start: (0pt, 0pt), end: (0pt, 315pt), stroke: 0.5pt + col-grid))
+    place(dx: x * 1pt, line(
+      start: (0pt, 0pt),
+      end: (0pt, 315pt),
+      stroke: 0.5pt + col-grid,
+    ))
   }
   for y in range(0, 315, step: 24) {
-    place(dy: y * 1pt, line(start: (0pt, 0pt), end: (600pt, 0pt), stroke: 0.5pt + col-grid))
+    place(dy: y * 1pt, line(
+      start: (0pt, 0pt),
+      end: (600pt, 0pt),
+      stroke: 0.5pt + col-grid,
+    ))
   }
   place(
     bottom,
-    rect(width: 100%, height: 4pt, fill: gradient.linear(col-cyan, col-emerald)),
+    rect(width: 100%, height: 4pt, fill: gradient.linear(
+      col-cyan,
+      col-emerald,
+    )),
   )
 }
 
@@ -58,23 +69,38 @@
 #let footer-line(left) = grid(
   columns: (1fr, auto),
   text(size: 9pt, fill: col-muted, left),
-  text(font: "JetBrains Mono", size: 9pt, fill: col-cyan, person.website.replace("https://", "")),
+  text(
+    font: "JetBrains Mono",
+    size: 9pt,
+    fill: col-cyan,
+    person.website.replace("https://", ""),
+  ),
 )
 
 // Shrink long titles so they always fit in three lines.
-#let title-size(title) = if title.len() > 80 { 24pt } else if title.len() > 50 { 28pt } else { 34pt }
+#let title-size(title) = if title.len() > 80 { 24pt } else if title.len() > 50 {
+  28pt
+} else { 34pt }
 
 #backdrop
 #pad(x: 36pt, top: 30pt, bottom: 28pt)[
   #block(height: 100%)[
     #if kind == "post" {
       let fm = frontmatter(sys.inputs.at("post"))
-      let category = fm.at("extra", default: (:)).at("category", default: "Blog")
+      let category = fm
+        .at("extra", default: (:))
+        .at("category", default: "Blog")
       block(brand)
       v(1fr)
       block(chip(category))
       v(10pt)
-      block(text(size: title-size(fm.title), weight: "bold", tracking: -0.02em, hyphenate: false, fm.title))
+      block(text(
+        size: title-size(fm.title),
+        weight: "bold",
+        tracking: -0.02em,
+        hyphenate: false,
+        fm.title,
+      ))
       if "description" in fm {
         v(8pt)
         block(width: 92%, text(size: 11pt, fill: col-muted, fm.description))
@@ -94,7 +120,10 @@
         font: "JetBrains Mono",
         size: 10pt,
         fill: col-muted,
-        str(years-experience(resume-data)) + "+ years · " + str(resume-data.experience.len()) + " roles · Full and short PDF editions",
+        str(years-experience(resume-data))
+          + "+ years · "
+          + str(resume-data.experience.len())
+          + " roles · Full and short PDF editions",
       ))
       v(1fr)
       footer-line(person.location)
@@ -105,7 +134,11 @@
       v(6pt)
       block(text(size: 15pt, fill: col-cyan, person.subtitle))
       v(14pt)
-      block(text(size: 11pt, fill: col-muted, "Engineering notes and resume: Kubernetes, immutable infrastructure, Rust, NixOS and AI harnesses."))
+      block(text(
+        size: 11pt,
+        fill: col-muted,
+        "Engineering notes and resume: Kubernetes, immutable infrastructure, Rust, NixOS and AI harnesses.",
+      ))
       v(1fr)
       footer-line("Blog · Resume")
     }

@@ -6,7 +6,9 @@
 // PDFs, social cards, years and role counts never see them.
 #let resume-data = {
   let data = yaml("/data/resume.yaml")
-  data.experience = data.experience.filter(r => not r.at("hidden", default: false))
+  data.experience = data.experience.filter(r => {
+    not r.at("hidden", default: false)
+  })
   data
 }
 
@@ -28,15 +30,33 @@
   }
 }
 
-#let first-start-months(data) = calc.min(..data.experience.map(r => to-months(r.start)))
+#let first-start-months(data) = calc.min(..data.experience.map(r => to-months(
+  r.start,
+)))
 
 // Whole years since the earliest role started.
-#let years-experience(data) = calc.div-euclid(today-months - first-start-months(data), 12)
+#let years-experience(data) = calc.div-euclid(
+  today-months - first-start-months(data),
+  12,
+)
 
 // Replace the "{years}" placeholder used in prose fields.
 #let fill(text, data) = text.replace("{years}", str(years-experience(data)))
 
-#let month-names = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+#let month-names = (
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+)
 
 #let fmt-month(ym) = {
   let parts = ym.split("-")
@@ -44,4 +64,8 @@
 }
 
 // "Jul 2023 – Present"
-#let fmt-period(role) = fmt-month(role.start) + " – " + if role.end == "" { "Present" } else { fmt-month(role.end) }
+#let fmt-period(role) = (
+  fmt-month(role.start)
+    + " – "
+    + if role.end == "" { "Present" } else { fmt-month(role.end) }
+)

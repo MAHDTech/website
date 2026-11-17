@@ -14,8 +14,11 @@
     font-display: swap;
 }
 
-@import "tailwindcss";
-@source not "../static/css/custom.css";
+/* Scan only templates and scripts. Automatic detection reads every tracked
+   file, so words in posts or data/resume.yaml would emit stray classes. */
+@import "tailwindcss" source(none);
+@source "../templates";
+@source "../static/js";
 
 /* ==========================================================================
    Adaptive Light / Dark Color System (Defaults to System Auto-Detect)
