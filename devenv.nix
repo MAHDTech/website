@@ -56,6 +56,14 @@ in
     zola
   ];
 
+  cachix = {
+    enable = true;
+    pull = [
+      "MAHDTech"
+    ];
+    push = "MAHDTech";
+  };
+
   git-hooks = {
     package = pkgs.prek;
     hooks = {
