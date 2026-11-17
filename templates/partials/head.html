@@ -1,0 +1,87 @@
+  {% set resume_data = load_data(path="data/resume.yaml") %}{% set person = resume_data.basics %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    try {
+      const s = localStorage.getItem("color-scheme");
+      if (s === "light" || s === "dark") {
+        document.querySelector('meta[name="color-scheme"]').content = s;
+      }
+    } catch {}
+  </script>
+
+  {% if page is defined and page.title %}
+    {% set meta_title = page.title ~ " | " ~ config.title %}
+  {% elif section is defined and section.title and section.relative_path != "_index.md" %}
+    {% set meta_title = section.title ~ " | " ~ config.title %}
+  {% elif section is defined and section.title %}
+    {% set meta_title = config.title ~ " · " ~ section.title %}
+  {% elif term is defined and term.name %}
+    {% set meta_title = "#" ~ term.name ~ " | " ~ config.title %}
+  {% elif taxonomy is defined and taxonomy.name %}
+    {% set meta_title = (taxonomy.name | capitalize) ~ " | " ~ config.title %}
+  {% else %}
+    {% set meta_title = "Page not found | " ~ config.title %}
+  {% endif %}
+
+  {% if page is defined and page.description %}
+    {% set meta_description = page.description %}
+  {% elif section is defined and section.description %}
+    {% set meta_description = section.description %}
+  {% else %}
+    {% set meta_description = config.description %}
+  {% endif %}
+
+  {% if current_url is defined and current_url %}
+    {% set canonical_url = current_url %}
+  {% else %}
+    {% set canonical_url = config.base_url ~ "/" %}
+  {% endif %}
+
+  {# Social cards are PNGs rendered by resume/og.typ (`generate`). They mirror
+     the content path: content/posts/foo.md -> static/og/posts/foo.png. #}
+  {% if page is defined %}
+    {% set og_path = "og/" ~ (page.relative_path | replace(from=".md", to=".png")) %}
+  {% elif section is defined and section.relative_path == "resume/_index.md" %}
+    {% set og_path = "og/resume.png" %}
+  {% else %}
+    {% set og_path = "og/site.png" %}
+  {% endif %}
+  {% if not get_image_metadata(path=og_path, allow_missing=true) %}
+    {% set og_path = "og/site.png" %}
+  {% endif %}
+  {% set og_image_url = get_url(path=og_path, trailing_slash=false) %}
+
+  <title>{{ meta_title }}</title>
+  <meta name="description" content="{{ meta_description }}">
+  <meta name="author" content="{{ person.name }}">
+  <link rel="canonical" href="{{ canonical_url | safe }}">
+
+  <link rel="icon" href="{{ config.extra.logo_path }}" type="image/svg+xml">
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url(path='atom.xml', trailing_slash=false) | safe }}">
+  <link rel="alternate" type="application/json" title="{{ person.name }} resume (JSON Resume)" href="/resume.json">
+  <link rel="alternate" type="text/markdown" title="{{ person.name }} resume (Markdown)" href="/resume.md">
+
+  <link rel="preload" href="/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/JetBrainsMono-Variable.woff2" as="font" type="font/woff2" crossorigin>
+
+  <meta property="og:type" content="{% if page is defined %}article{% else %}website{% endif %}">
+  <meta property="og:site_name" content="{{ config.title }}">
+  <meta property="og:title" content="{{ meta_title }}">
+  <meta property="og:description" content="{{ meta_description }}">
+  <meta property="og:url" content="{{ canonical_url | safe }}">
+  <meta property="og:image" content="{{ og_image_url | safe }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  {% if page is defined and page.date %}
+  <meta property="article:published_time" content="{{ page.date }}">
+  {% endif %}
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ meta_title }}">
+  <meta name="twitter:description" content="{{ meta_description }}">
+  <meta name="twitter:image" content="{{ og_image_url | safe }}">
+
+  <link rel="stylesheet" href="{{ get_url(path='css/custom.css', cachebust=true) | safe }}">

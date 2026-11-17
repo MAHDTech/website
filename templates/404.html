@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-xl mx-auto py-12">
+  <section class="monolith-card chamfer-reticle p-8 text-center space-y-5">
+    <p class="font-mono text-xs text-accent-amber tracking-wider">404</p>
+    <h1 class="font-semibold text-3xl text-text-primary tracking-tight">Page not found</h1>
+    <p class="text-sm text-text-muted leading-relaxed">
+      That page doesn't exist, or it moved. Try search, or head back to the blog.
+    </p>
+    <div class="flex flex-wrap justify-center gap-3 pt-2">
+      <a href="/" class="px-4 py-2.5 rounded-[6px] bg-accent-cyan text-canvas font-medium text-sm">Back to the blog</a>
+      <button type="button" data-palette-open class="px-4 py-2.5 rounded-[6px] border border-border bg-well hover:border-accent-cyan text-text-primary text-sm cursor-pointer">Search</button>
+    </div>
+  </section>
+</div>
+{% endblock %}

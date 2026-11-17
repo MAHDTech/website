@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-8">
+  {{ <ui.section_header code="Browse" title={taxonomy.name | capitalize} summary="Posts grouped by topic." /> }}
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    {% for item in terms %}
+      <a href="{{ item.permalink | safe }}" class="monolith-card p-5 flex items-center justify-between hover:border-accent-cyan transition-colors group">
+        <span class="font-mono font-bold text-sm text-text-primary group-hover:text-accent-cyan">#{{ item.name }}</span>
+        <span class="status-chip tabular-nums">{{ item.pages | length }}</span>
+      </a>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

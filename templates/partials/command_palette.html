@@ -1,0 +1,63 @@
+{#- Ctrl/Cmd+K command palette. Static entries are rendered here; full-text
+    post results come from the Pagefind index at runtime (static/js/site.js). -#}
+{% set resume = load_data(path="data/resume.yaml") %}
+{% set posts_section = get_section(path="posts/_index.md") %}{% set posts = posts_section.pages %}
+<dialog id="command-palette" aria-label="Search and commands" class="palette-dialog">
+  <div class="monolith-card overflow-hidden flex flex-col max-h-[min(36rem,calc(100dvh-4rem))]">
+    <div class="flex items-center gap-3 px-4 border-b border-border">
+      <svg aria-hidden="true" class="w-4 h-4 text-text-muted shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <input
+        id="palette-input"
+        type="text"
+        role="combobox"
+        aria-expanded="true"
+        aria-controls="palette-list"
+        aria-autocomplete="list"
+        autocomplete="off"
+        spellcheck="false"
+        placeholder="Search posts or type a command…"
+        class="w-full h-14 bg-transparent text-base text-text-primary placeholder:text-text-muted/70 outline-none"
+      >
+      <kbd class="font-mono text-[10px] px-1.5 py-0.5 rounded border border-border bg-well text-text-muted">Esc</kbd>
+    </div>
+
+    <ul id="palette-list" role="listbox" aria-label="Results" class="overflow-y-auto p-2 flex-1">
+      <li role="presentation" data-palette-group class="palette-group">Go to</li>
+      {% for item in config.extra.menu_items %}
+        <li role="option" data-palette-item data-href="{{ item.url | safe }}" data-keywords="{{ item.name | lower }} page">{{ item.name }}</li>
+      {% endfor %}
+      <li role="option" data-palette-item data-href="{{ resume.basics.github_url | safe }}" data-external data-keywords="github code source">GitHub ↗</li>
+
+      <li role="presentation" data-palette-group class="palette-group">Resume</li>
+      {% for key in ["full", "short"] %}
+        {% set dl = resume.downloads[key] %}
+        <li role="option" data-palette-item data-href="/resume/{{ dl.filename }}" data-download="{{ dl.filename }}" data-keywords="download pdf cv resume {{ key }}">Download {{ dl.label | lower }} (PDF)</li>
+      {% endfor %}
+      <li role="option" data-palette-item data-copy="{{ resume.basics.email }}" data-keywords="email contact mail copy">Copy email address</li>
+      <li role="option" data-palette-item data-href="/resume.json" data-keywords="json resume machine readable agent api">Resume as JSON (JSON Resume)</li>
+      <li role="option" data-palette-item data-href="/resume.md" data-keywords="markdown resume agent llm">Resume as Markdown</li>
+
+      <li role="presentation" data-palette-group class="palette-group">Theme</li>
+      <li role="option" data-palette-item data-theme-set="system" data-keywords="theme auto system appearance">Use system theme</li>
+      <li role="option" data-palette-item data-theme-set="light" data-keywords="theme light appearance">Use light theme</li>
+      <li role="option" data-palette-item data-theme-set="dark" data-keywords="theme dark appearance">Use dark theme</li>
+
+      {% if posts | length > 0 %}
+        <li role="presentation" data-palette-group class="palette-group">Posts</li>
+        {% for post in posts %}
+          <li role="option" data-palette-item data-href="{{ post.permalink | safe }}" data-keywords="{{ (post.description | default(value='') ~ ' ' ~ (post.taxonomies.tags | default(value=[]) | join(sep=' '))) | lower }}">
+            {{ post.title }}
+          </li>
+        {% endfor %}
+      {% endif %}
+
+      <li role="presentation" data-palette-group data-palette-fulltext hidden class="palette-group">Matches in post text</li>
+    </ul>
+
+    <p data-palette-empty hidden class="px-4 py-6 text-sm text-text-muted text-center">Nothing matches that search.</p>
+    <div class="px-4 py-2.5 border-t border-border flex items-center justify-between gap-3 font-mono text-[10px] text-text-muted">
+      <span>↑↓ to move · Enter to open</span>
+      <span>Full-text search by Pagefind</span>
+    </div>
+  </div>
+</dialog>

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block top_overlay %}
+  <div class="reading-progress" aria-hidden="true"></div>
+{% endblock %}
+
+{% block content %}
+{% set has_toc = page.toc | length > 1 %}
+
+<div data-pagefind-body class="space-y-8">
+  <nav data-pagefind-ignore aria-label="Breadcrumb" class="text-sm text-text-muted flex items-center gap-2 min-w-0">
+    <a href="/" class="hover:text-accent-cyan transition-colors shrink-0">← All posts</a>
+    {% if page.extra.category %}
+      <span class="hidden sm:inline text-border-strong" aria-hidden="true">/</span>
+      <span class="hidden sm:inline truncate">{{ page.extra.category }}</span>
+    {% endif %}
+  </nav>
+
+  <header class="monolith-card overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-12">
+      <div class="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between gap-6">
+        <div class="space-y-4">
+          <div data-pagefind-ignore class="flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-xs text-text-muted tabular-nums">
+            {% if page.extra.category %}{{ <ui.chip label={page.extra.category} variant="cyan" /> }}{% endif %}
+            {% if page.date %}<time datetime="{{ page.date }}">{{ page.date | date(format="%d %B %Y") }}</time>{% endif %}
+            {% if page.reading_time %}<span>· {{ page.reading_time }} min read</span>{% endif %}
+            {% if page.draft %}{{ <ui.chip label="Draft" variant="amber" /> }}{% endif %}
+          </div>
+
+          <h1 class="font-semibold text-3xl sm:text-4xl text-text-primary tracking-tight leading-tight">{{ page.title }}</h1>
+
+          {% if page.description %}
+            <p class="text-base sm:text-lg text-text-muted leading-relaxed">{{ page.description }}</p>
+          {% endif %}
+        </div>
+
+        <div data-pagefind-ignore class="pt-4 border-t border-border flex flex-wrap items-center justify-between gap-3">
+          <div class="flex flex-wrap items-center gap-1.5">
+            {% if page.taxonomies.tags is defined %}{{ <ui.tag_links tags={page.taxonomies.tags} size="md" /> }}{% endif %}
+          </div>
+          <button type="button" data-copy-text="{{ page.permalink | safe }}" class="inline-flex items-center gap-2 min-h-[34px] px-3 py-1.5 rounded-[5px] border border-border bg-well hover:border-accent-cyan text-xs text-text-muted hover:text-accent-cyan cursor-pointer transition-colors">
+            <span data-copy-label>Copy link</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="hidden lg:flex lg:col-span-5 bg-well border-l border-border items-center justify-center overflow-hidden">
+        {{ <ui.cover post={page} eager={true} classes="w-full h-full object-cover" /> }}
+      </div>
+    </div>
+  </header>
+
+  {% if page.extra.digest is defined or page.extra.key_points is defined %}
+    <aside aria-label="Summary" class="monolith-card p-5 sm:p-6 border-l-4 border-l-accent-cyan space-y-3">
+      <p class="font-mono text-xs uppercase tracking-wider text-accent-cyan">TL;DR</p>
+      {% if page.extra.digest is defined %}
+        <p class="text-base text-text-primary leading-relaxed">{{ page.extra.digest }}</p>
+      {% endif %}
+      {% if page.extra.key_points is defined and page.extra.key_points | length > 0 %}
+        <ul class="space-y-1.5 text-sm text-text-muted leading-relaxed">
+          {% for pt in page.extra.key_points %}
+            <li class="flex items-start gap-2"><span class="text-accent-emerald" aria-hidden="true">▸</span><span>{{ pt }}</span></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </aside>
+  {% endif %}
+
+  {% if has_toc %}
+    <div data-pagefind-ignore class="lg:hidden">{{ <ui.toc toc={page.toc} collapsible={true} /> }}</div>
+  {% endif %}
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <div class="{% if has_toc %}lg:col-span-8 xl:col-span-9{% else %}lg:col-span-12 max-w-4xl mx-auto w-full{% endif %} space-y-8 min-w-0">
+      <article class="prose-mahd monolith-card p-5 sm:p-8 lg:p-10">
+        {{ page.content | safe }}
+      </article>
+
+      {# With date sorting, Zola's `higher` is the older post and `lower` the newer one. #}
+      {% if page.higher or page.lower %}
+        <nav data-pagefind-ignore aria-label="More posts" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {% if page.higher %}
+            <a href="{{ page.higher.permalink | safe }}" rel="prev" class="monolith-card p-5 hover:border-accent-cyan transition-colors group">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-text-muted">← Older</span>
+              <p class="font-semibold text-text-primary group-hover:text-accent-cyan mt-1.5">{{ page.higher.title }}</p>
+            </a>
+          {% else %}
+            <div class="hidden sm:block"></div>
+          {% endif %}
+          {% if page.lower %}
+            <a href="{{ page.lower.permalink | safe }}" rel="next" class="monolith-card p-5 hover:border-accent-cyan transition-colors group sm:text-right">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-text-muted">Newer →</span>
+              <p class="font-semibold text-text-primary group-hover:text-accent-cyan mt-1.5">{{ page.lower.title }}</p>
+            </a>
+          {% endif %}
+        </nav>
+      {% endif %}
+
+      {% if config.extra.giscus is defined and page.extra.comments | default(value=true) %}
+        {{ <ui.comments giscus={config.extra.giscus} /> }}
+      {% endif %}
+    </div>
+
+    {% if has_toc %}
+      <aside data-pagefind-ignore aria-label="Table of contents" class="hidden lg:block lg:col-span-4 xl:col-span-3 lg:sticky lg:top-22">
+        {{ <ui.toc toc={page.toc} /> }}
+      </aside>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+---
+name: CI
+
+# Pull requests only: Deploy runs the same `devenv test` on trunk before publishing.
+on:
+  pull_request:
+    branches:
+      - trunk
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: CI Validation
+    uses: tars-cloud/actions/.github/workflows/consumer-devenv-ci.yaml@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+    with:
+      job-name: validate
+      # `devenv test` already runs every hook in its git-hooks:run task.
+      lint-command: ""

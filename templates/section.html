@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-8">
+  {{ <ui.section_header code="Archive" title={section.title} summary={section.description | default(value="")} /> }}
+
+  {% if section.pages | length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for post in section.pages %}
+        {{ <ui.blog_card post={post} eager_image={loop.first} /> }}
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="monolith-card p-8 text-text-muted">No posts published yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

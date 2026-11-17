@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="{{ lang | default(value=config.default_language) }}" class="antialiased">
+<head>
+{% include "partials/head.html" %}
+  {% block head_extra %}{% endblock %}
+</head>
+<body class="min-h-screen flex flex-col bg-canvas bg-blueprint-grid text-text-primary font-sans relative overflow-x-hidden">
+  {% block top_overlay %}{% endblock %}
+
+  <a
+    href="#main-content"
+    class="visually-hidden focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:px-4 focus:py-2 focus:rounded-[6px] focus:bg-surface-raised focus:text-accent-cyan focus:border focus:border-accent-cyan focus:text-sm"
+  >
+    Skip to main content
+  </a>
+
+{% include "partials/header.html" %}
+
+  <main id="main-content" tabindex="-1" class="{% block main_class %}flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12{% endblock %}">
+    {% block content %}{% endblock %}
+  </main>
+
+{% include "partials/footer.html" %}
+{% include "partials/command_palette.html" %}
+
+  <script src="{{ get_url(path='js/site.js', cachebust=true) | safe }}" defer></script>
+  {% block scripts %}{% endblock %}
+</body
+</html>

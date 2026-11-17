@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" fill="none">
+  <defs>
+    <linearGradient id="g4" x1="0" y1="0" x2="1200" y2="675" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0B0914"/>
+      <stop offset="100%" stop-color="#091526"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#g4)"/>
+  <rect x="140" y="160" width="920" height="355" rx="12" fill="#090D16" stroke="#334155" stroke-width="2"/>
+  <circle cx="180" cy="196" r="7" fill="#F43F5E"/>
+  <circle cx="204" cy="196" r="7" fill="#F59E0B"/>
+  <circle cx="228" cy="196" r="7" fill="#34D399"/>
+  <line x1="140" y1="226" x2="1060" y2="226" stroke="#1E293B" stroke-width="2"/>
+  <text x="184" y="294" fill="#38BDF8" font-family="monospace" font-size="24">$ init --origin 2020-01-01 --node mahdtech</text>
+  <text x="184" y="348" fill="#E2E8F0" font-family="monospace" font-size="28" font-weight="bold">&gt; Welcome to MAHDTech // Genesis Commit</text>
+  <text x="184" y="402" fill="#94A3B8" font-family="monospace" font-size="20"># From neglected side project to deterministic agentic platform.</text>
+  <text x="184" y="458" fill="#34D399" font-family="monospace" font-size="18">STATUS: REVAMPED_AND_ONLINE</text>
+</svg>

@@ -1,0 +1,65 @@
+# Site configuration for https://mahdtech.com
+# Personal details (name, email, links) live in data/resume.yaml, not here.
+base_url = "https://mahdtech.com"
+title = "MAHDTech"
+description = "Screaming Engineering notes into the void."
+default_language = "en"
+
+compile_sass = false
+build_search_index = false
+generate_feeds = true
+feed_filenames = ["atom.xml"]
+
+taxonomies = [
+  { name = "tags", feed = true },
+  { name = "categories", feed = true },
+]
+
+[markdown]
+
+# Wrap each heading in a link to itself so sections can be shared.
+insert_anchor_links = "heading"
+render_emoji = true
+external_links_target_blank = true
+external_links_no_follow = false
+external_links_no_referrer = true
+smart_punctuation = false
+
+[markdown.highlighting]
+
+error_on_missing_language = true
+theme = "one-dark-pro"
+
+[extra]
+
+subtitle = "MAHD about tech"
+repository_url = "https://github.com/MAHDTech/website"
+logo_path = "/images/logo.svg"
+# Tag and keyword filters appear on the blog index once there are this many posts.
+blog_filter_min_posts = 10
+
+# Post comments via giscus (GitHub Discussions). Each post maps to the
+# discussion titled with its path; giscus creates it on the first comment.
+# Delete this table to turn comments off; set `extra.comments: false` on a
+# post to hide them there. IDs come from https://giscus.app.
+[extra.giscus]
+
+repo = "MAHDTech/website"
+repo_id = "R_kgDOJCN97g"
+category = "Comments"
+category_id = "DIC_kwDOJCN97s4DLHSo"
+mapping = "pathname"
+theme_light = "light"
+theme_dark = "transparent_dark"
+
+# `also_active` lists extra path prefixes that highlight the item as current.
+[[extra.menu_items]]
+
+name = "Blog"
+url = "/"
+also_active = ["/posts/", "/tags/", "/categories/"]
+
+[[extra.menu_items]]
+
+name = "Resume"
+url = "/resume/"

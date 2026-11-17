@@ -1,0 +1,4 @@
+{#- Opening tag for headings (config.toml: insert_anchor_links = "heading").
+    Zola replaces the contents with the heading text. No aria-label: it would
+    replace the heading's accessible name with the slug. -#}
+<a class="heading-anchor" href="#{{ id }}"></a>

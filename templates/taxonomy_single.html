@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="space-y-8">
+  <a href="/" class="text-sm text-accent-cyan hover:underline">← All posts</a>
+
+  {{ <ui.section_header code={"Tag · " ~ (term.pages | length) ~ " posts"} title={"#" ~ term.name} /> }}
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for post in term.pages %}
+      {{ <ui.blog_card post={post} eager_image={loop.first} /> }}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

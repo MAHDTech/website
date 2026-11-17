@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+{% set resume = load_data(path="data/resume.yaml") %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": {{ resume.basics.name | json_encode() | safe }},
+  "alternateName": {{ resume.basics.handle | json_encode() | safe }},
+  "jobTitle": {{ resume.basics.subtitle | json_encode() | safe }},
+  "email": {{ ("mailto:" ~ resume.basics.email) | json_encode() | safe }},
+  "url": {{ resume.basics.website | json_encode() | safe }},
+  "sameAs": [{{ resume.basics.github_url | json_encode() | safe }}],
+  "workLocation": { "@type": "Place", "name": {{ resume.basics.location | json_encode() | safe }} }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+{% set resume = load_data(path="data/resume.yaml") %}
+{# Page counts are written by the `resumes` devenv script after compiling the PDFs. #}
+{% set pdf_meta = load_data(path="static/resume/meta.json", required=false) %}
+
+{# ---- Derived facts: everything below is computed from `experience` ---- #}
+{# Roles with `hidden: true` are skipped in every loop, so they add nothing to the counts, years or timeline. #}
+{% set now_m = (now() | date(format="%Y") | int) * 12 + (now() | date(format="%m") | int) %}
+{% set_global first_m = now_m %}
+{% set_global org_seen = "|" %}
+{% set_global org_count = 0 %}
+{% set_global role_count = 0 %}
+{% for role in resume.experience %}
+  {% if role.hidden is defined and role.hidden %}{% continue %}{% endif %}
+  {% set_global role_count = role_count + 1 %}
+  {% set parts = role.start | split(pat="-") %}
+  {% set s_m = (parts[0] | int) * 12 + (parts[1] | int) %}
+  {% if s_m < first_m %}{% set_global first_m = s_m %}{% endif %}
+  {% if ("|" ~ role.company ~ "|") not in org_seen %}
+    {% set_global org_seen = org_seen ~ role.company ~ "|" %}
+    {% set_global org_count = org_count + 1 %}
+  {% endif %}
+{% endfor %}
+{% set years = (now_m - first_m) // 12 %}
+{% set first_year = (first_m - 1) // 12 %}
+{% set span_m = now_m - first_m %}
+{% set years_token = "{years}" %}
+{% set summary = resume.profile.executive_summary | replace(from=years_token, to=years ~ "") %}
+
+<div id="resume-root" data-pagefind-body data-resume-density="full" class="space-y-10">
+  <section data-pagefind-ignore aria-label="Resume view and downloads" class="no-print monolith-card p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-text-muted">Theme</span>
+        <div role="group" aria-label="Colour theme" class="segmented">
+          <button type="button" data-theme-choice="system" aria-pressed="true">Auto</button>
+          <button type="button" data-theme-choice="light" aria-pressed="false">Light</button>
+          <button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-text-muted">Detail</span>
+        <div role="group" aria-label="Resume detail" class="segmented">
+          <button type="button" data-density-choice="full" aria-pressed="true">Full</button>
+          <button type="button" data-density-choice="short" aria-pressed="false">Short</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2.5">
+      <button type="button" id="agent-spec-trigger" class="inline-flex items-center gap-2 min-h-[38px] px-3.5 py-2 rounded-[6px] border border-border bg-well hover:border-accent-cyan text-text-primary hover:text-accent-cyan text-sm cursor-pointer transition-colors">
+        <span class="w-2 h-2 rounded-full bg-accent-violet inline-block" aria-hidden="true"></span>
+        For AI agents
+      </button>
+
+      <div class="relative inline-block">
+        <button id="resume-download-btn" type="button" popovertarget="resume-download-popover" class="inline-flex items-center gap-2.5 min-h-[38px] px-4 py-2 rounded-[6px] bg-accent-cyan text-canvas hover:bg-accent-cyan-bright font-medium text-sm cursor-pointer transition-colors glow-cyan">
+          <svg aria-hidden="true" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Download PDF <span aria-hidden="true" class="text-[10px]">▾</span>
+        </button>
+
+        <div id="resume-download-popover" popover="auto" class="anchored-popover space-y-2">
+          {% for key in ["full", "short"] %}
+            {% set dl = resume.downloads[key] %}
+            <a href="/resume/{{ dl.filename }}" download="{{ dl.filename }}" data-popover-close class="block p-3 rounded-[6px] border border-border bg-well hover:border-accent-cyan transition-colors group">
+              <span class="flex items-center justify-between gap-2">
+                <span class="font-semibold text-sm text-text-primary group-hover:text-accent-cyan">{{ dl.label }}</span>
+                {% if pdf_meta and pdf_meta[key ~ "_pages"] is defined %}
+                  {% set n = pdf_meta[key ~ "_pages"] %}
+                  <span class="status-chip status-chip-cyan tabular-nums">{{ n }} page{% if n != 1 %}s{% endif %}</span>
+                {% endif %}
+              </span>
+              <span class="block text-xs text-text-muted mt-1.5 leading-snug">{{ dl.sublabel }}</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <header class="monolith-card chamfer-reticle p-6 sm:p-8 lg:p-10 space-y-8">
+    <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-6">
+      <div class="space-y-3 max-w-2xl">
+        {% if resume.basics.status %}<div>{{ <ui.chip label={resume.basics.status} variant="emerald" pulse={true} /> }}</div>{% endif %}
+        <h1 class="font-semibold text-4xl sm:text-5xl text-text-primary tracking-tight">{{ resume.basics.name }}</h1>
+        <p class="text-lg sm:text-xl text-accent-cyan font-medium">{{ resume.basics.subtitle }}</p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-end gap-2.5 text-sm">
+        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-[5px] bg-well border border-border text-text-primary">{{ resume.basics.location }}</span>
+        <button type="button" data-copy-text="{{ resume.basics.email }}" aria-label="Copy email address {{ resume.basics.email }}" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-[5px] bg-well border border-border hover:border-accent-cyan text-text-primary hover:text-accent-cyan cursor-pointer transition-colors">
+          <span>{{ resume.basics.email }}</span>
+          <span data-copy-label class="px-1.5 py-0.5 rounded-[3px] bg-surface-raised border border-border text-[10px] uppercase text-text-muted">Copy</span>
+        </button>
+        <a href="{{ resume.basics.github_url | safe }}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-[5px] bg-well border border-border hover:border-accent-cyan text-text-primary hover:text-accent-cyan transition-colors">
+          github.com/{{ resume.basics.github }} <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-6 border-t border-border">
+      {{ <ui.metric value={years ~ "+ years"} label="Platform & SRE" detail={"Since " ~ first_year ~ ", across federal and global tech"} /> }}
+      {{ <ui.metric value={role_count ~ " roles"} label="Delivered" detail={"With " ~ org_count ~ " organisations, from GitHub and Red Hat to federal agencies"} /> }}
+      {% for h in resume.highlights %}
+        {{ <ui.metric value={h.value} label={h.label} detail={h.detail} /> }}
+      {% endfor %}
+    </div>
+
+    {# Career timeline: each role drawn to scale between the first start date and today. #}
+    <div data-pagefind-ignore class="space-y-2" aria-label="Career timeline">
+      <div class="relative h-9 rounded-[6px] bg-well border border-border">
+        {% set_global seg_i = 0 %}
+        {% for role in resume.experience %}
+          {% if role.hidden is defined and role.hidden %}{% continue %}{% endif %}
+          {% set sp = role.start | split(pat="-") %}
+          {% set s_m = (sp[0] | int) * 12 + (sp[1] | int) %}
+          {% if role.end == "" %}
+            {% set e_m = now_m %}
+          {% else %}
+            {% set ep = role.end | split(pat="-") %}
+            {% set e_m = (ep[0] | int) * 12 + (ep[1] | int) %}
+          {% endif %}
+          <a
+            href="#{{ role.id }}"
+            aria-label="{{ role.company }}, {{ role.role }}"
+            class="timeline-seg timeline-seg-{{ seg_i % 3 }}{% if role.end == '' %} timeline-seg-current{% endif %}"
+            style="left: {{ (100 * (s_m - first_m) / span_m) | round(precision=3) }}%; width: {{ (100 * (e_m - s_m) / span_m) | round(precision=3) }}%"
+          >
+            <span class="timeline-tip" role="tooltip">
+              <strong>{{ role.company }}</strong><br>{{ role.role }}<br>
+              <span class="tabular-nums">{{ <ui.period start={role.start} end={role.end} /> }} · {{ <ui.duration months={e_m - s_m} /> }}</span>
+            </span>
+          </a>
+          {% set_global seg_i = seg_i + 1 %}
+        {% endfor %}
+      </div>
+      <div class="relative h-4 font-mono text-[10px] text-text-muted tabular-nums" aria-hidden="true">
+        {% for y in range(start=first_year + 1, end=(now_m - 1) // 12 + 1) %}
+          <span class="absolute -translate-x-1/2{% if y % 2 == 1 %} hidden sm:inline{% endif %}" style="left: {{ (100 * (y * 12 + 1 - first_m) / span_m) | round(precision=3) }}%">{{ y }}</span>
+        {% endfor %}
+      </div>
+    </div>
+  </header>
+
+  <section aria-labelledby="resume-profile-heading" class="space-y-5">
+    {{ <ui.section_header code="01 · Profile" title="Profile" heading_id="resume-profile-heading" /> }}
+    <p class="text-lg text-text-primary leading-relaxed max-w-4xl">{{ summary }}</p>
+    <div data-density-full class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for stmt in resume.profile.statements %}
+        <article class="monolith-card p-5 space-y-2 border-t-2 border-t-accent-cyan">
+          <h3 class="font-mono text-xs uppercase tracking-wider text-accent-cyan">{{ stmt.category }}</h3>
+          <p class="text-sm text-text-primary leading-relaxed">{{ stmt.text }}</p>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+    <section aria-labelledby="resume-experience-heading" class="lg:col-span-8 space-y-5">
+      {{ <ui.section_header code="02 · Experience" title="Experience" summary={role_count ~ " roles since " ~ first_year ~ ". Select a skill to filter them."} heading_id="resume-experience-heading" /> }}
+
+      <div id="resume-skill-filter-bar" hidden class="no-print monolith-well px-4 py-3 border-l-4 border-l-accent-cyan flex flex-wrap items-center justify-between gap-3">
+        <p id="resume-skill-filter-status" role="status" aria-live="polite" class="text-sm text-text-primary tabular-nums"></p>
+        <button type="button" id="resume-skill-filter-clear" class="px-3 py-1 rounded-[4px] border border-accent-cyan bg-surface-raised text-accent-cyan text-xs cursor-pointer hover:bg-surface-active">Clear filter</button>
+      </div>
+
+      <div class="space-y-5">
+        {% for role in resume.experience %}
+          {% if role.hidden is defined and role.hidden %}{% continue %}{% endif %}
+          {% set role_tech_blob = (role.tech_stack | join(sep=" ") ~ " " ~ role.short_summary ~ " " ~ role.company ~ " " ~ role.role) | lower %}
+          <article id="{{ role.id }}" data-role-card data-role-tech="{{ role_tech_blob }}" class="monolith-card scroll-reveal-card p-6 sm:p-7 space-y-4 scroll-mt-24 transition-colors hover:border-border-strong">
+            <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 border-b border-border pb-4">
+              <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-2.5">
+                  {% if role.end == "" %}<span class="status-pulse w-2.5 h-2.5 rounded-full bg-accent-emerald inline-block" aria-hidden="true"></span>{% endif %}
+                  <h3 class="font-semibold text-lg sm:text-xl text-text-primary tracking-tight">{{ role.company }}</h3>
+                </div>
+                <p class="text-sm sm:text-base font-medium text-accent-cyan">
+                  {{ role.role }} <span class="text-xs font-normal text-text-muted ml-1">{{ role.employment_type }}</span>
+                </p>
+              </div>
+              <div class="sm:text-right text-xs text-text-muted tabular-nums shrink-0 space-y-1">
+                <div class="font-mono px-2.5 py-1 rounded-[4px] bg-well border border-border inline-block text-text-primary">{{ <ui.period start={role.start} end={role.end} /> }}</div>
+                <div>{{ role.location }}</div>
+              </div>
+            </div>
+
+            <p data-density-short class="text-[15px] text-text-primary leading-relaxed">{{ role.short_summary }}</p>
+
+            <div data-density-full class="space-y-3.5">
+              <ul class="space-y-2.5">
+                {% for b in role.bullets %}
+                  <li class="flex items-start gap-2.5 text-[15px] text-text-primary leading-relaxed">
+                    <span class="text-accent-cyan mt-0.5 shrink-0" aria-hidden="true">▸</span>
+                    <span><strong class="font-semibold">{{ b.verb }}</strong> {{ b.detail }}</span>
+                  </li>
+                {% endfor %}
+              </ul>
+              {% if role.note is defined and role.note != "" %}
+                <div class="monolith-well px-4 py-2.5 border-l-2 border-l-accent-amber text-sm italic text-text-muted leading-relaxed">
+                  <strong class="not-italic font-mono text-xs uppercase tracking-wider text-accent-amber">Note</strong> {{ role.note }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div class="pt-3 border-t border-border flex flex-wrap items-center gap-1.5">
+              <span class="font-mono text-[11px] uppercase tracking-wider text-text-muted mr-1">Stack</span>
+              {% for tech in role.tech_stack %}
+                <button type="button" data-skill-filter="{{ tech }}" aria-pressed="false" class="skill-pill">{{ tech }}</button>
+              {% endfor %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    <aside aria-labelledby="resume-skills-heading" class="lg:col-span-4 space-y-5">
+      <div class="border-b border-border pb-5 space-y-2">
+        <p class="font-mono text-xs text-accent-cyan tracking-wider">03 · Skills</p>
+        <h2 id="resume-skills-heading" class="font-semibold text-2xl text-text-primary tracking-tight">Skills</h2>
+        <p class="no-print text-xs text-text-muted leading-relaxed">Select a skill to show the roles that used it.</p>
+      </div>
+
+      <div class="space-y-3.5">
+        {% for group in resume.skills %}
+          <section class="monolith-card p-4 space-y-3">
+            <h3 class="font-semibold text-sm text-text-primary">{{ group.category }}</h3>
+            {% if group.details is defined %}
+              <ul data-density-full class="space-y-1.5 text-xs text-text-muted leading-relaxed">
+                {% for d in group.details %}
+                  <li class="flex items-start gap-2"><span class="text-accent-cyan" aria-hidden="true">•</span><span>{{ d }}</span></li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+            <div class="flex flex-wrap gap-1.5">
+              {% for item in group.items %}
+                <button type="button" data-skill-filter="{{ item }}" aria-pressed="false" class="skill-pill text-left">{{ item }}</button>
+              {% endfor %}
+            </div>
+          </section>
+        {% endfor %}
+      </div>
+    </aside>
+  </div>
+
+  <dialog id="agent-spec-dialog" aria-labelledby="agent-spec-title" class="agent-dialog">
+    <div class="monolith-card p-6 sm:p-7 space-y-4 max-h-[calc(100dvh-2rem)] flex flex-col">
+      <div class="flex items-start justify-between gap-4 border-b border-border pb-4">
+        <div class="space-y-1">
+          <h2 id="agent-spec-title" class="font-semibold text-lg text-text-primary">Resume for AI agents</h2>
+          <p class="text-sm text-text-muted">
+            For the AI overlords, machine readable copies generated on every build:
+            <br/>- <a href="/resume.md" class="text-accent-cyan underline underline-offset-2">Markdown</a>
+            <br/>- <a href="/resume.json" class="text-accent-cyan underline underline-offset-2">JSON</a>
+            <br/>- <a href="/llms.txt" class="text-accent-cyan underline underline-offset-2">llms.txt</a>
+          </p>
+        </div>
+        <button type="button" id="agent-spec-close" class="px-3 py-1.5 rounded-[5px] border border-border bg-well hover:border-accent-cyan text-xs text-text-primary cursor-pointer">Close</button>
+      </div>
+      <pre id="agent-spec-payload" data-src="/resume.md" class="monolith-well p-4 text-xs font-mono text-text-primary overflow-auto flex-1 whitespace-pre-wrap leading-relaxed">Loading…</pre>
+      <div class="flex flex-wrap items-center justify-end gap-3 pt-2 border-t border-border">
+        <button type="button" data-copy-target="agent-spec-payload" class="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-accent-cyan text-canvas font-medium text-sm cursor-pointer hover:bg-accent-cyan-bright">
+          <span data-copy-label>Copy Markdown</span>
+        </button>
+      </div>
+    </div>
+  </dialog>
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ get_url(path='js/resume.js', cachebust=true) | safe }}" defer></script>
+{% endblock %}

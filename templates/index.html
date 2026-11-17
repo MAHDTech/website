@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set resume_data = load_data(path="data/resume.yaml") %}{% set person = resume_data.basics %}
+{% set posts_section = get_section(path="posts/_index.md") %}{% set all_posts = posts_section.pages %}
+{% set show_filters = all_posts | length >= config.extra.blog_filter_min_posts %}
+
+<div class="space-y-12">
+  <section class="max-w-3xl space-y-5 pt-2">
+    <p class="font-mono text-xs text-accent-cyan tracking-wider">{{ person.name }} · {{ person.subtitle }}</p>
+    <h1 class="font-semibold text-4xl sm:text-5xl text-text-primary tracking-tight leading-[1.1]">
+      {{ section.title }}
+    </h1>
+    <p class="text-lg text-text-muted leading-relaxed">{{ section.description }}</p>
+    <div class="flex flex-wrap items-center gap-2.5 pt-1">
+      <a href="/resume/" class="inline-flex items-center gap-2 min-h-[40px] px-4 py-2 rounded-[6px] bg-accent-cyan text-canvas font-medium text-sm hover:bg-accent-cyan-bright transition-colors glow-cyan">
+        View resume <span aria-hidden="true">→</span>
+      </a>
+      <button type="button" data-palette-open class="inline-flex items-center gap-2 min-h-[40px] px-4 py-2 rounded-[6px] border border-border bg-surface-raised hover:border-accent-cyan text-text-primary hover:text-accent-cyan text-sm transition-colors cursor-pointer">
+        Search posts
+      </button>
+      <a href="{{ get_url(path='atom.xml', trailing_slash=false) | safe }}" class="inline-flex items-center gap-2 min-h-[40px] px-4 py-2 rounded-[6px] border border-border bg-surface-raised hover:border-accent-cyan text-text-primary hover:text-accent-cyan text-sm transition-colors">
+        Atom feed
+      </a>
+    </div>
+  </section>
+
+  {% if show_filters %}
+    {% set tags_taxonomy = get_taxonomy(kind="tags") %}
+    <section aria-label="Filter posts" class="monolith-card p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="w-full md:max-w-sm">
+        <label for="blog-filter-input" class="visually-hidden">Filter posts by keyword</label>
+        <input id="blog-filter-input" type="search" placeholder="Filter posts…" autocomplete="off" class="w-full min-h-[38px] px-3.5 py-2 rounded-[6px] bg-well border border-border focus:border-accent-cyan text-sm text-text-primary placeholder:text-text-muted/70">
+      </div>
+      <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter posts by tag">
+        <button type="button" data-tag-filter="all" aria-pressed="true" class="tag-filter">All ({{ all_posts | length }})</button>
+        {% for term in tags_taxonomy.items %}
+          <button type="button" data-tag-filter="{{ term.name | lower }}" aria-pressed="false" class="tag-filter">#{{ term.name }} <span class="opacity-70 tabular-nums">({{ term.pages | length }})</span></button>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+  {% if all_posts | length > 0 %}
+    {% set latest_post = all_posts | first %}
+    <section aria-labelledby="latest-heading" data-featured-wrapper class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 id="latest-heading" class="font-mono text-xs uppercase tracking-wider text-accent-cyan">Latest</h2>
+        {% if show_filters %}<span data-filter-status role="status" aria-live="polite" class="text-xs text-text-muted tabular-nums"></span>{% endif %}
+      </div>
+      {{ <ui.blog_card post={latest_post} featured={true} eager_image={true} /> }}
+    </section>
+
+    {% if all_posts | length > 1 %}
+      <section aria-labelledby="more-heading" data-archive-wrapper class="space-y-4">
+        <h2 id="more-heading" class="font-mono text-xs uppercase tracking-wider text-accent-cyan">More posts</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {% for post in all_posts %}
+            {% if not loop.first %}
+              {{ <ui.blog_card post={post} /> }}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
+    {% if show_filters %}
+      <div id="blog-empty-state" hidden class="monolith-card p-10 text-center space-y-4">
+        <p class="text-sm text-text-primary">No posts match that filter.</p>
+        <button type="button" id="blog-reset-filter" class="tag-filter">Reset filters</button>
+      </div>
+    {% endif %}
+  {% else %}
+    <p class="monolith-card p-8 text-text-muted">No posts published yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

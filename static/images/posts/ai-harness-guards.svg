@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" fill="none">
+  <defs>
+    <linearGradient id="g1" x1="0" y1="0" x2="1200" y2="675" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#060913"/>
+      <stop offset="50%" stop-color="#0D162B"/>
+      <stop offset="100%" stop-color="#071B2E"/>
+    </linearGradient>
+    <pattern id="p1" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1E293B" stroke-width="1" stroke-opacity="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="675" fill="url(#g1)"/>
+  <rect width="1200" height="675" fill="url(#p1)"/>
+  <circle cx="600" cy="337" r="260" fill="#38BDF8" fill-opacity="0.07"/>
+  <!-- Phase-gated pipeline schematic -->
+  <g stroke-width="2">
+    <line x1="170" y1="338" x2="1030" y2="338" stroke="#334155" stroke-dasharray="8 6"/>
+    <rect x="110" y="258" width="140" height="160" rx="8" fill="#0B1220" stroke="#38BDF8"/>
+    <text x="180" y="302" text-anchor="middle" fill="#38BDF8" font-family="monospace" font-size="16" font-weight="bold">[G] GATHER</text>
+    <text x="180" y="336" text-anchor="middle" fill="#94A3B8" font-family="monospace" font-size="13">Context</text>
+    <text x="180" y="358" text-anchor="middle" fill="#94A3B8" font-family="monospace" font-size="13">Spec Lock</text>
+    <circle cx="180" cy="390" r="6" fill="#34D399"/>
+
+    <rect x="295" y="258" width="140" height="160" rx="8" fill="#0B1220" stroke="#60A5FA"/>
+    <text x="365" y="302" text-anchor="middle" fill="#60A5FA" font-family="monospace" font-size="16" font-weight="bold">[A] ARCH</text>
+    <text x="365" y="336" text-anchor="middle" fill="#94A3B8" font-family="monospace" font-size="13">ADR + Plan</text>
+    <text x="365" y="358" text-anchor="middle" fill="#94A3B8" font-family="monospace" font-size="13">Gate Check</text>
+    <circle cx="365" cy="390" r="6" fill="#34D399"/>
+
+    <rect x="480" y="238" width="240" height="200" rx="10" fill="#0F1B33" stroke="#F59E0B" stroke-width="2.5"/>
+    <text x="600" y="286" text-anchor="middle" fill="#F59E0B" font-family="monospace" font-size="18" font-weight="bold">[R] REALIZE + VERIFY</text>
+    <text x="600" y="322" text-anchor="middle" fill="#E2E8F0" font-family="monospace" font-size="14">Isolated Worktree</text>
+    <text x="600" y="348" text-anchor="middle" fill="#38BDF8" font-family="monospace" font-size="13">CASE != DOYLE</text>
+    <rect x="524" y="372" width="152" height="32" rx="4" fill="#090D16" stroke="#34D399"/>
+    <text x="600" y="393" text-anchor="middle" fill="#34D399" font-family="monospace" font-size="13" font-weight="bold">CONTRACT: PASS</text>
+
+    <rect x="765" y="258" width="140" height="160" rx="8" fill="#0B1220" stroke="#A78BFA"/>
+    <text x="835" y="302" text-anchor="middle" fill="#A78BFA" font-family="monospace" font-size="16" font-weight="bold">[D] DEMO</text>
+    <text x="835" y="336" text-anchor="middle" fill="#94A3B8" font-family="monospace" font-size="13">Suite + Docs</text>
+    <text x="835" y="358" text-anchor="middle" fill="#94A3B8" font-family="monospace" font-size="13">Evidence</text>
+    <circle cx="835" cy="390" r="6" fill="#34D399"/>
+
+    <rect x="950" y="258" width="140" height="160" rx="8" fill="#0B1220" stroke="#34D399"/>
+    <text x="1020" y="302" text-anchor="middle" fill="#34D399" font-family="monospace" font-size="16" font-weight="bold">[S] SHIP</text>
+    <text x="1020" y="336" text-anchor="middle" fill="#94A3B8" font-family="monospace" font-size="13">Attested PR</text>
+    <text x="1020" y="358" text-anchor="middle" fill="#94A3B8" font-family="monospace" font-size="13">Audit Trail</text>
+    <circle cx="1020" cy="390" r="6" fill="#34D399"/>
+  </g>
+  <text x="110" y="120" fill="#38BDF8" font-family="monospace" font-size="18" letter-spacing="3">DISPATCH // AI HARNESS ARCHITECTURE</text>
+  <text x="110" y="164" fill="#F8FAFC" font-family="sans-serif" font-size="34" font-weight="700">Phase-Gated Agentic Execution Contracts</text>
+  <text x="110" y="575" fill="#64748B" font-family="monospace" font-size="16">GUARDS_PROTOCOL :: SEPARATION OF IMPLEMENTATION &amp; VERIFICATION</text>
+</svg>

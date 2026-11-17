@@ -1,0 +1,208 @@
+{# Shared UI components. Tera 2 components only see their arguments, so pass
+   anything from `config` or loaded data in explicitly. #}
+
+{% component ui.chip(label, variant="", pulse=false) %}
+  {% if variant == "cyan" %}
+    {% set chip_cls = "status-chip-cyan" %}{% set dot_cls = "bg-accent-cyan" %}
+  {% elif variant == "amber" %}
+    {% set chip_cls = "status-chip-amber" %}{% set dot_cls = "bg-accent-amber" %}
+  {% elif variant == "violet" %}
+    {% set chip_cls = "status-chip-violet" %}{% set dot_cls = "bg-accent-violet" %}
+  {% elif variant == "emerald" %}
+    {% set chip_cls = "status-chip-nominal" %}{% set dot_cls = "bg-accent-emerald" %}
+  {% else %}
+    {% set chip_cls = "" %}{% set dot_cls = "bg-text-muted" %}
+  {% endif %}
+  <span class="status-chip {{ chip_cls }} inline-flex items-center gap-2">
+    {% if pulse %}<span class="status-pulse w-2 h-2 rounded-full {{ dot_cls }} inline-block" aria-hidden="true"></span>{% endif %}
+    <span>{{ label }}</span>
+  </span>
+{% endcomponent ui.chip %}
+
+{% component ui.section_header(code, title, summary="", heading_id="") %}
+  <div class="border-b border-border pb-5 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+    <div class="space-y-2 max-w-2xl">
+      <p class="font-mono text-xs text-accent-cyan tracking-wider">{{ code }}</p>
+      <h2{% if heading_id != "" %} id="{{ heading_id }}"{% endif %} class="font-semibold text-2xl sm:text-3xl text-text-primary tracking-tight">
+        {{ title }}
+      </h2>
+    </div>
+    {% if summary != "" %}
+      <p class="text-sm text-text-muted max-w-xl leading-relaxed">{{ summary }}</p>
+    {% endif %}
+  </div>
+{% endcomponent ui.section_header %}
+
+{# One navigation link. Current when the path equals the URL, starts with a
+   non-root URL, or starts with one of the item's `also_active` prefixes. #}
+{% component ui.nav_link(item, active_path, mobile=false) %}
+  {% set is_current = active_path == item.url or (item.url != "/" and active_path is starting_with(pat=item.url)) %}
+  {% for prefix in item.also_active | default(value=[]) %}
+    {% if active_path is starting_with(pat=prefix) %}{% set_global nav_hit = true %}{% endif %}
+  {% endfor %}
+  {% if nav_hit | default(value=false) %}{% set is_current = true %}{% endif %}
+  {% set_global nav_hit = false %}
+  {% set external = item.external | default(value=false) %}
+  <a
+    href="{{ item.url | safe }}"
+    {% if external %}target="_blank" rel="noopener noreferrer"{% endif %}
+    {% if is_current %}aria-current="page"{% endif %}
+    {% if mobile %}
+    class="nav-link text-sm font-medium text-text-primary hover:text-accent-cyan py-2.5 px-3 rounded-[6px] border border-border bg-well flex items-center justify-between"
+    {% else %}
+    class="nav-link text-sm font-medium text-text-muted hover:text-accent-cyan transition-colors py-1.5 border-b-2 border-transparent"
+    {% endif %}
+  >
+    <span>{{ item.name }}</span>{% if external %}<span aria-hidden="true" class="text-accent-cyan ml-1">↗</span>{% endif %}
+  </a>
+{% endcomponent ui.nav_link %}
+
+{# Cover image for a post. Falls back to the site banner when a post has none. #}
+{% component ui.cover(post, classes="", eager=false) %}
+  {% set src = post.extra.image | default(value="/images/og-banner.svg") %}
+  {% if src is not starting_with(pat="/") and src is not starting_with(pat="http") %}
+    {% set src = "/" ~ src %}
+  {% endif %}
+  <img
+    src="{{ src | safe }}"
+    alt="{{ post.extra.image_alt | default(value='') }}"
+    width="1200"
+    height="675"
+    {% if eager %}fetchpriority="high" loading="eager"{% else %}loading="lazy" decoding="async"{% endif %}
+    class="{{ classes }}"
+  >
+{% endcomponent ui.cover %}
+
+{% component ui.tag_links(tags, size="sm") %}
+  {% for tag in tags %}
+    <a
+      href="{{ get_taxonomy_url(kind='tags', name=tag) | safe }}"
+      class="px-2 py-0.5 rounded-[4px] bg-well border border-border hover:border-accent-cyan font-mono {% if size == 'sm' %}text-[11px]{% else %}text-xs{% endif %} text-text-muted hover:text-accent-cyan transition-colors"
+    >#{{ tag }}</a>
+  {% endfor %}
+{% endcomponent ui.tag_links %}
+
+{% component ui.blog_card(post, featured=false, eager_image=false) %}
+  {% set category_label = post.extra.category | default(value="Post") %}
+  {% if post.taxonomies.tags is defined %}
+    {% set tag_list = post.taxonomies.tags %}
+  {% else %}
+    {% set tag_list = [] %}
+  {% endif %}
+  {% set tags_joined = tag_list | join(sep=",") | lower %}
+  {% set search_blob = (post.title ~ " " ~ (post.description | default(value="")) ~ " " ~ category_label ~ " " ~ tags_joined) | lower %}
+
+  <article
+    data-post-card
+    data-post-tags="{{ tags_joined }}"
+    data-post-search="{{ search_blob }}"
+    class="monolith-card scroll-reveal-card overflow-hidden group transition-colors hover:border-accent-cyan {% if featured %}grid grid-cols-1 lg:grid-cols-12{% else %}flex flex-col{% endif %}"
+  >
+    <a
+      href="{{ post.permalink | safe }}"
+      aria-hidden="true"
+      tabindex="-1"
+      class="{% if featured %}lg:col-span-7 border-b lg:border-b-0 lg:border-r{% else %}border-b{% endif %} border-border block bg-well overflow-hidden aspect-[16/9]"
+    >
+      {{ <ui.cover post={post} eager={eager_image} classes="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" /> }}
+    </a>
+
+    <div class="{% if featured %}lg:col-span-5 p-6 sm:p-8{% else %}p-5 sm:p-6 flex-1{% endif %} flex flex-col gap-4">
+      <div class="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-text-muted tabular-nums">
+        {{ <ui.chip label={category_label} variant="cyan" /> }}
+        <span>
+          {% if post.date %}<time datetime="{{ post.date }}">{{ post.date | date(format="%d %b %Y") }}</time>{% endif %}
+          {% if post.reading_time %}<span aria-hidden="true"> · </span>{{ post.reading_time }} min read{% endif %}
+        </span>
+      </div>
+
+      <h3 class="font-semibold {% if featured %}text-2xl sm:text-3xl{% else %}text-xl{% endif %} leading-snug text-text-primary tracking-tight">
+        <a href="{{ post.permalink | safe }}" class="group-hover:text-accent-cyan transition-colors">{{ post.title }}</a>
+      </h3>
+
+      {% if post.description %}
+        <p class="text-sm sm:text-[15px] text-text-muted leading-relaxed">{{ post.description }}</p>
+      {% endif %}
+
+      <div class="mt-auto pt-3 flex flex-wrap items-center gap-1.5">
+        {{ <ui.tag_links tags={tag_list} /> }}
+      </div>
+    </div>
+  </article>
+{% endcomponent ui.blog_card %}
+
+{# Table of contents. `collapsible` renders a <details> for small screens. #}
+{% component ui.toc(toc, collapsible=false) %}
+  {% if collapsible %}
+    <details class="monolith-card p-4 group/toc">
+      <summary class="cursor-pointer list-none flex items-center justify-between font-mono text-xs uppercase tracking-wider text-accent-cyan">
+        <span>On this page</span>
+        <span aria-hidden="true" class="transition-transform group-open/toc:rotate-180">▾</span>
+      </summary>
+  {% else %}
+    <div class="monolith-card p-5 space-y-3">
+      <p class="font-mono text-xs uppercase tracking-wider text-accent-cyan border-b border-border pb-2.5">On this page</p>
+  {% endif %}
+      <nav aria-label="Article sections" class="{% if collapsible %}pt-3{% endif %}">
+        <ul class="space-y-2 text-sm">
+          {% for h in toc %}
+            <li class="space-y-1.5">
+              <a href="{{ h.permalink | safe }}" class="block text-text-muted hover:text-accent-cyan transition-colors leading-snug">{{ h.title }}</a>
+              {% if h.children | length > 0 %}
+                <ul class="pl-3 border-l border-border space-y-1">
+                  {% for c in h.children %}
+                    <li><a href="{{ c.permalink | safe }}" class="block text-text-muted/80 hover:text-accent-cyan transition-colors leading-snug">{{ c.title }}</a></li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+  {% if collapsible %}</details>{% else %}</div>{% endif %}
+{% endcomponent ui.toc %}
+
+{# "Jul 2023 – Present" from YYYY-MM strings; empty end means current. #}
+{% component ui.period(start, end) %}{{ (start ~ "-01") | date(format="%b %Y") }} – {% if end == "" %}Present{% else %}{{ (end ~ "-01") | date(format="%b %Y") }}{% endif %}{% endcomponent ui.period %}
+
+{# "2 yrs 4 mos" from a month count. #}
+{% component ui.duration(months) %}{% set y = months // 12 %}{% set m = months % 12 %}{% if y > 0 %}{{ y }} yr{% if y > 1 %}s{% endif %}{% endif %}{% if y > 0 and m > 0 %} {% endif %}{% if m > 0 or y == 0 %}{{ m }} mo{% if m != 1 %}s{% endif %}{% endif %}{% endcomponent ui.duration %}
+
+{% component ui.metric(value, label, detail) %}
+  <div class="monolith-well p-4 space-y-1">
+    <div class="font-semibold text-2xl text-accent-cyan tabular-nums tracking-tight">{{ value }}</div>
+    <div class="font-mono text-xs text-text-primary uppercase tracking-wider">{{ label }}</div>
+    <p class="text-xs text-text-muted leading-snug">{{ detail }}</p>
+  </div>
+{% endcomponent ui.metric %}
+
+{# giscus comments for one page, configured by `config.extra.giscus`.
+   static/js/site.js loads giscus.app/client.js into [data-giscus] with the
+   current theme and keeps it in sync with the theme toggle. #}
+{% component ui.comments(giscus) %}
+  <section data-pagefind-ignore aria-labelledby="comments-heading" class="monolith-card p-6 sm:p-8 space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
+      <h2 id="comments-heading" class="font-semibold text-lg text-text-primary">Comments</h2>
+      <p class="text-xs text-text-muted">Sign in with GitHub to comment or react.</p>
+    </div>
+    <div
+      data-giscus
+      data-repo="{{ giscus.repo }}"
+      data-repo-id="{{ giscus.repo_id }}"
+      data-category="{{ giscus.category }}"
+      data-category-id="{{ giscus.category_id }}"
+      data-mapping="{{ giscus.mapping }}"
+      data-strict="1"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="top"
+      data-lang="en"
+      data-loading="lazy"
+      data-theme-light="{{ giscus.theme_light }}"
+      data-theme-dark="{{ giscus.theme_dark }}"
+      class="min-h-24"
+    >
+      <noscript><p class="text-sm text-text-muted">Comments need JavaScript. You can also join in on <a class="text-accent-cyan hover:underline" href="https://github.com/{{ giscus.repo }}/discussions">GitHub Discussions</a>.</p></noscript>
+    </div>
+  </section>
+{% endcomponent ui.comments %}
