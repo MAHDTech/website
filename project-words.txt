@@ -57,3 +57,5 @@ typechecks
 Typst
 worktree
 worktrees
+versionrc
+alnum
