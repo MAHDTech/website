@@ -40,8 +40,6 @@ in
 {
   packages = with pkgs; [
     actionlint
-    # TODO: re-enable once convco builds again; libgit2-sys fails to find libgit2 in current nixpkgs.
-    # convco
     git
     jaq
     markdownlint-cli
@@ -71,8 +69,12 @@ in
       # Exclusions live in .prettierignore so the editor honours them too.
       prettier.enable = true;
       nixfmt.enable = true;
-      # TODO: re-enable once convco builds again; libgit2-sys fails to find libgit2 in current nixpkgs.
-      convco.enable = false;
+      convco = {
+        enable = true;
+        settings = {
+          configPath = ".versionrc";
+        };
+      };
       actionlint.enable = true;
       ripsecrets.enable = true;
       statix.enable = true;
