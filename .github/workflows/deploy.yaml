@@ -31,14 +31,14 @@ jobs:
       name: github-pages
       url: ${{ steps.deploy_to_gh_pages.outputs.page_url }}
     steps:
-      - id: setup_consumer
-        name: Set Up Consumer
-        uses: tars-cloud/actions/composite/setup-consumer@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+      - id: setup_project
+        name: Set Up Project
+        uses: tars-cloud/actions/composite/setup-project@e237e0ca8fbf31df927e9418d6b94dd81a462a35 # v4.0.0
 
       # `devenv test` runs `build` and verifies public/ before anything is published.
       - id: build_site
         name: Build and Verify Site
-        uses: tars-cloud/actions/composite/run-devenv@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+        uses: tars-cloud/actions/composite/run-devenv@e237e0ca8fbf31df927e9418d6b94dd81a462a35 # v4.0.0
         env:
           # Years of experience come from the current month in Sydney.
           TZ: "Australia/Sydney"
@@ -59,7 +59,7 @@ jobs:
       - id: report_status
         name: Report Deployment Status
         if: always()
-        uses: tars-cloud/actions/composite/report-status@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+        uses: tars-cloud/actions/composite/report-status@e237e0ca8fbf31df927e9418d6b94dd81a462a35 # v4.0.0
         with:
           title: Deployment Results
           results: |
