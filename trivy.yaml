@@ -2,7 +2,7 @@
 ##################################################
 # Trivy Configuration
 # https://trivy.dev/latest/docs/references/configuration/config-file/
-# Read by the SecOps workflow (consumer-trivy, config-file: auto).
+# Read by the SecOps workflow (trivy, config-file: auto).
 ##################################################
 
 scan:

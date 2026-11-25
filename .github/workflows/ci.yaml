@@ -19,7 +19,7 @@ concurrency:
 jobs:
   validate:
     name: CI Validation
-    uses: tars-cloud/actions/.github/workflows/consumer-devenv-ci.yaml@253eb09c3b4249a2f4adb70f8a6e87203129e4e2 # v3.15.0
+    uses: tars-cloud/actions/.github/workflows/devenv-ci.yaml@e237e0ca8fbf31df927e9418d6b94dd81a462a35 # v4.0.0
     with:
       job-name: validate
       # `devenv test` already runs every hook in its git-hooks:run task.
