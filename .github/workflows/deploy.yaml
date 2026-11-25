@@ -14,8 +14,6 @@ on:
 permissions:
   contents: read
   actions: read
-  pages: write
-  id-token: write
 
 # Never cancel a deployment part-way; queue the next one instead.
 concurrency:
@@ -23,13 +21,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
-    name: Build and Deploy Site
+  build:
+    name: Build Site
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-    environment:
-      name: github-pages
-      url: ${{ steps.deploy_to_gh_pages.outputs.page_url }}
     steps:
       - id: setup_project
         name: Set Up Project
@@ -52,6 +47,28 @@ jobs:
         with:
           path: ./public
 
+      - id: report_status
+        name: Report Build Status
+        if: always()
+        uses: tars-cloud/actions/composite/report-status@e237e0ca8fbf31df927e9418d6b94dd81a462a35 # v4.0.0
+        with:
+          title: Build Results
+          results: |
+            build-site=${{ steps.build_site.outcome }}
+            upload-pages-artifact=${{ steps.upload_pages_artifact.outcome }}
+
+  deploy:
+    name: Deploy Site
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy_to_gh_pages.outputs.page_url }}
+    steps:
       - id: deploy_to_gh_pages
         name: Deploy to GH Pages
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
@@ -63,5 +80,5 @@ jobs:
         with:
           title: Deployment Results
           results: |
-            build-site=${{ steps.build_site.outcome }}
+            build-site=${{ needs.build.result }}
             deploy-pages=${{ steps.deploy_to_gh_pages.outcome }}
